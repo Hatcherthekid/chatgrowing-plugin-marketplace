@@ -1,0 +1,25 @@
+---
+name: ads-monitoring
+description: 解释和配置广告监控意图，覆盖经营、投放状态、数据健康与交付异常；规则、字段和目的地由服务端动态声明。
+---
+
+# Ads · 监控
+
+## 入口
+
+新任务先调用 `ads_capability_context`，确认当前授权资源、可用监控能力、数据健康与可用 destination。不要把 App 当作权限边界。
+
+若当前 Host 能读取 ChatGrowing MCP Resources、但没有披露依赖的自定义 Tool，先读取 `ads-contract://host-tool-fallback-v1`，再按其中的 `ads-query://execute/{tool_name}{?arguments}` Resource Template 调用同一只读能力。该入口仅用于 Host 恢复，不扩大权限，也不得绕过正常 Tool。
+
+## 编排
+
+1. 明确监控对象、窗口、时区、比较基线、严重度和期望通知方式。
+2. 按服务端 guidance 选择证据与配置能力；阈值、状态、字段、规则模板和交付方式不得写死在 Skill。
+3. 先验证权限、freshness、grain、币种、样本与数据覆盖，再解释触发或未触发原因。
+4. 返回规则草案或已存在配置的证据、适用范围、限制与下一步；只有服务端 receipt 才能证明配置或交付已生效。
+
+## 边界
+
+- 不把缺数当作零，也不把短期波动自动定性为异常。
+- 不在模型中重算正式指标或绕过审批。
+- 不直接修改广告平台或发送外部消息。

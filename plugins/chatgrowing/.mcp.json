@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "chatgrowing_ads_read": {
+      "title": "ChatGrowing Ads Read",
+      "description": "OAuth 保护的 ChatGrowing Ads Read Remote MCP；只读取当前成员被授权的 source/provider 资源，App 仅作为查询与语义 facet。",
+      "type": "http",
+      "url": "https://chatgrowing.com/mcp",
+      "scopes": [
+        "ads.read",
+        "openid",
+        "profile",
+        "offline_access"
+      ],
+      "oauth": {
+        "client_id": "https://chatgpt.com/oauth/codex/npgGhq3mjJ9W/client.json"
+      }
+    }
+  }
+}
