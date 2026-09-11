@@ -1,0 +1,14 @@
+{
+  "schema_version": "chatgrowing.installation-materials-update.v1",
+  "status": "staged_not_published",
+  "plugin_version": "0.3.3",
+  "artifact_sha256": "90cda3b1651b57c4985db1c0bbd542ddc589c7b3a68dcdcc525912efb593c0cb",
+  "plugin_tree_sha256": "224d94162e6b2a075b075cc2fce86c3cae923b28dd385b6eb9c2fba111e5b518",
+  "previous_marketplace_metadata_sha256": "6d9124bcc3b042784ab3c1a62595cc5d90630e8ea0c27ad69fac8e720be818b6",
+  "files": {
+    "INSTALL.md": "ce32fa1a2a6654db29531c2f4b30dd4e639c2973f9ff5a443146ef91ec1931af",
+    "scripts/preflight.sh": "a368e4e10bccaf390d06711b594fea6b7669a10f5b9e7ebcbfd6e963e93c8bb0"
+  },
+  "runtime_release_changed": false,
+  "new_oauth_or_query_acceptance": "not_performed"
+}
