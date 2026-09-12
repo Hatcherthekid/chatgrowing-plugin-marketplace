@@ -14,6 +14,21 @@
       "oauth": {
         "client_id": "https://chatgpt.com/oauth/codex/npgGhq3mjJ9W/client.json"
       }
+    },
+    "chatgrowing_material_actions": {
+      "title": "ChatGrowing Materials",
+      "description": "OAuth protected material Action MCP for assets, YouTube channels, publishing, readback, and deletion. Writes require user confirmation.",
+      "type": "http",
+      "url": "https://chatgrowing.com/material-actions/mcp",
+      "scopes": [
+        "chatgrowing.materials",
+        "openid",
+        "profile",
+        "offline_access"
+      ],
+      "oauth": {
+        "client_id": "https://chatgpt.com/oauth/codex/npgGhq3mjJ9W/client.json"
+      }
     }
   }
 }

@@ -14,11 +14,11 @@
   "source_exposure": "plugin_bundle_only",
   "server_authorization_required": true,
   "compatibility_policy": "current_and_previous_stable_plugin",
-  "plugin_version": "0.3.3",
+  "plugin_version": "0.4.0+codex.20260912220000",
   "bootstrap_contract_version": "ChatGrowingBootstrapContract.v1",
-  "source_git_commit": "e26bcd8b1078bd681bd5150f37d0e2287cabaffa",
-  "built_at_utc": "2026-09-03T06:55:47.562189Z",
-  "artifact_sha256": "90cda3b1651b57c4985db1c0bbd542ddc589c7b3a68dcdcc525912efb593c0cb",
+  "source_git_commit": "e13f64508f62835741f77d10e30d0c46f9c316a0",
+  "built_at_utc": "2026-09-12T13:57:49.637600Z",
+  "artifact_sha256": "40f3df85967623209c4923e18e53458cd974ffe4f419a5eb6bb354f7d00c2634",
   "tool_schema_version": "AdsCapabilityMcpPublicSchema.v3",
   "tool_schema_fingerprint": "d9c13266a22bf5c512ff19d9086886cc5becec147b6c75c4141b4d5e95b7b702",
   "host_tool_disclosure_bytes": 26431,
@@ -55,8 +55,15 @@
     "counts_by_category": {}
   },
   "mcp_resource": "https://chatgrowing.com/mcp",
+  "mcp_resources": {
+    "chatgrowing_ads_read": "https://chatgrowing.com/mcp",
+    "chatgrowing_material_actions": "https://chatgrowing.com/material-actions/mcp"
+  },
   "oauth_scopes": [
     "ads.read"
+  ],
+  "action_oauth_scopes": [
+    "chatgrowing.materials"
   ],
   "oauth_client_id_metadata_document": "https://chatgpt.com/oauth/codex/npgGhq3mjJ9W/client.json",
   "minimum_codex_version": "0.144.5",
