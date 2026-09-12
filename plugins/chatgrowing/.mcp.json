@@ -25,10 +25,7 @@
         "openid",
         "profile",
         "offline_access"
-      ],
-      "oauth": {
-        "client_id": "https://chatgpt.com/oauth/codex/npgGhq3mjJ9W/client.json"
-      }
+      ]
     }
   }
 }
