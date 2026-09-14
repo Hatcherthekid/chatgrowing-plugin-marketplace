@@ -7,7 +7,7 @@ description: 核对当前授权范围内的广告实体、指标、标签、组�
 
 ## 入口
 
-新任务先调用 `ads_capability_context`。只使用响应中当前 principal 可见的资源、能力、目标 facet、destination 与 server guidance；App 是查询 facet，不是授权资源，也不与账户强绑定。
+新任务先调用 `ads_capability_context`。只使用响应中当前 principal 可见的资源、能力、目标 facet、destination 与 server guidance。App facet 不授予权限，也不与账户强绑定；若服务端返回显式 App 级授权资源，按其 resource_ref 和可用能力使用，不能把账户授权扩展为整 App 授权。
 
 若当前 Host 能读取 ChatGrowing MCP Resources、但没有披露依赖的自定义 Tool，先读取 `ads-contract://host-tool-fallback-v1`，再按其中的 `ads-query://execute/{tool_name}{?arguments}` Resource Template 调用同一只读能力。该入口仅用于 Host 恢复，不扩大权限，也不得绕过正常 Tool。
 

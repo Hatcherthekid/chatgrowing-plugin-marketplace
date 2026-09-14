@@ -7,7 +7,7 @@ description: 判断效果变化更像流量、App 转化、归因数据、业务
 
 ## 入口
 
-新任务先调用 `ads_capability_context`。App 只用于查询和归因分析，不进入账户授权模型；同一授权资源可覆盖多个 App facet。
+新任务先调用 `ads_capability_context`。普通 App facet 只用于查询和归因分析；服务端明确返回的当前授权 App 资源才允许查询该 App 的全媒体归因聚合。媒体账户授权仍按服务端返回的账户资源隔离，并只补充对应媒体的归因与广告读取数据。
 
 若当前 Host 能读取 ChatGrowing MCP Resources、但没有披露依赖的自定义 Tool，先读取 `ads-contract://host-tool-fallback-v1`，再按其中的 `ads-query://execute/{tool_name}{?arguments}` Resource Template 调用同一只读能力。该入口仅用于 Host 恢复，不扩大权限，也不得绕过正常 Tool。
 

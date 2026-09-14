@@ -28,5 +28,6 @@ artifact ownership as the normal Tool path.
 
 The Git distribution repository may be public, but data is not. Reading ChatGrowing data requires Auth0
 sign-in, active organization membership, and an assigned resource scope. This
-package contains no backend source code, advertising credentials, tokens, or data.
-It provides no advertising-platform write operations.
+package contains the reviewed local file helper required by reference-only material
+workflows. It contains no server source, advertising credentials, tokens, or customer data.
+YouTube writes remain behind server authorization and explicit human confirmation.

@@ -7,7 +7,7 @@ description: 自由查询和分析当前授权广告数据，支持汇总、比�
 
 ## 入口
 
-每个新任务先调用 `ads_capability_context`。它返回当前 principal 可见的资源、能力、版本、health、typed guidance 和兼容状态。App 是分析 facet，不是授权资源；不得要求用户先提供固定账户 ID 或预设 App 名称。
+每个新任务先调用 `ads_capability_context`。它返回当前 principal 可见的资源、能力、版本、health、typed guidance 和兼容状态。App facet 本身不授予权限；服务端明确返回 App 级授权资源时，使用其 resource_ref 查询全媒体聚合，不能从账户授权或 App 名称推导整 App 权限。不得要求用户先提供固定账户 ID 或预设 App 名称。
 
 若当前 Host 能读取 ChatGrowing MCP Resources、但没有披露依赖的自定义 Tool，先读取 `ads-contract://host-tool-fallback-v1`，再按其中的 `ads-query://execute/{tool_name}{?arguments}` Resource Template 调用同一只读能力。该入口仅用于 Host 恢复，不扩大权限，也不得绕过正常 Tool。
 
