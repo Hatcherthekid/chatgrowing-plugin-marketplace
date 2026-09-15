@@ -14,11 +14,11 @@
   "source_exposure": "reviewed_plugin_and_local_helper_bundle_only",
   "server_authorization_required": true,
   "compatibility_policy": "current_and_previous_stable_plugin",
-  "plugin_version": "0.4.2",
+  "plugin_version": "0.4.3",
   "bootstrap_contract_version": "ChatGrowingBootstrapContract.v1",
-  "source_git_commit": "28ab8cc2a540f04047def466e0da3f96db8b0d31",
-  "built_at_utc": "2026-09-15T07:02:19.332025+00:00",
-  "artifact_sha256": "c7daf440b77386be37226e842b36cdf8e6c570e0e9091b2a4911b8578a79c35d",
+  "source_git_commit": "093eda3822675fc1e2797bb001867d5977584619",
+  "built_at_utc": "2026-09-15T08:16:03.688116+00:00",
+  "artifact_sha256": "e175df635472a828733f0ab7b8948713fa2d6d5aa4c2e960fc58bc9bcd046865",
   "tool_schema_version": "AdsCapabilityMcpPublicSchema.v3",
   "tool_schema_fingerprint": "d9c13266a22bf5c512ff19d9086886cc5becec147b6c75c4141b4d5e95b7b702",
   "host_tool_disclosure_bytes": 26431,
@@ -70,21 +70,22 @@
     "authorization": "same_as_tool",
     "allowed_surface": "public_read_tools_only"
   },
-  "rollback_plugin_version": "not_assigned",
+  "rollback_plugin_version": "0.4.2",
   "publication_gates": {
     "artifact_independent_direct_query": "required",
     "fresh_session_tool_discovery_and_query": "required",
     "authorization_fail_closed_contract": "required"
   },
   "incremental_acceptance": {
-    "kind": "analysis_skill_guidance_delta",
-    "baseline_commit": "8eeaac4a11c4f7a5ceb8bcf1e894ce88f201343d",
-    "baseline_artifact_sha256": "2b55cb37458d23e7d4d1c231a938e472abc0b9cd061f55fdb8471152b5c0296f",
-    "unchanged_runtime_and_tool_contracts": true,
-    "full_runtime_gates": "inherited_from_byte_identical_runtime; not rerun",
+    "kind": "material_callback_specific_client_repair",
+    "baseline_commit": "8741a6590081558d49f9b0b408ae0e740b65cc61",
+    "baseline_artifact_sha256": "c7daf440b77386be37226e842b36cdf8e6c570e0e9091b2a4911b8578a79c35d",
     "changed_files": [
-      ".codex-plugin/plugin.json",
-      "skills/ads-read-analysis/SKILL.md"
-    ]
+      ".mcp.json",
+      ".codex-plugin/plugin.json"
+    ],
+    "unchanged_runtime_and_tool_contracts": true,
+    "ads_runtime_gates": "unchanged byte-identical Ads entry and implementation; no new live acceptance claimed",
+    "material_oauth_acceptance": "pending user authorization; configuration checked against public CIMD and server allowlist"
   }
 }

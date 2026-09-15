@@ -1,0 +1,24 @@
+{
+  "schema_version": "chatgrowing.oauth-client-repair-evidence.v1",
+  "recorded_at_utc": "2026-09-15T08:16:03.688116+00:00",
+  "baseline_commit": "8741a6590081558d49f9b0b408ae0e740b65cc61",
+  "source_git_commit": "093eda3822675fc1e2797bb001867d5977584619",
+  "baseline_version": "0.4.2",
+  "plugin_version": "0.4.3",
+  "artifact_sha256": "e175df635472a828733f0ab7b8948713fa2d6d5aa4c2e960fc58bc9bcd046865",
+  "changed_files": [
+    "plugins/chatgrowing/.codex-plugin/plugin.json",
+    "plugins/chatgrowing/.mcp.json"
+  ],
+  "checks": {
+    "exact_mcp_url_callback_derivation": true,
+    "public_material_cimd_metadata_fetched": true,
+    "material_callback_id": "6HrrjagQYNOt",
+    "production_material_client_allowlisted": true,
+    "runtime_skills_and_ads_oauth_unchanged": true,
+    "release_builder_and_marketplace_regressions": "41 passed; unchanged builders"
+  },
+  "acceptance_scope": "Configuration repair only. No new real-user Material OAuth or YouTube upload acceptance claimed.",
+  "real_material_oauth": "pending_user_authorization",
+  "real_youtube_upload": "pending_user_authorization"
+}
