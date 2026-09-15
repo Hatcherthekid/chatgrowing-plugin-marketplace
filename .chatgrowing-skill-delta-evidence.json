@@ -1,0 +1,24 @@
+{
+  "schema_version": "chatgrowing.skill-delta-evidence.v1",
+  "recorded_at_utc": "2026-09-15T05:57:14.865099+00:00",
+  "baseline_commit": "22bfc79decb35bbe0e946c74ceb4172e8a5d7b09",
+  "baseline_version": "0.4.0+codex.20260913100000",
+  "baseline_artifact_sha256": "c59f4a521172449e15a5259685390d3e7459756bfa3e383dd0f419ac101487a1",
+  "baseline_publication_gate_evidence_sha256": "e9ce9d3a72a0c26b274e335af809a2756fb4efe3aef8d41f8c92add525ec8618",
+  "source_git_commit": "22bb223d130414cf90f0d24cbb6ce70fa6055810",
+  "plugin_version": "0.4.1",
+  "artifact_sha256": "2b55cb37458d23e7d4d1c231a938e472abc0b9cd061f55fdb8471152b5c0296f",
+  "changed_files": [
+    ".codex-plugin/plugin.json",
+    "skills/ads-read-analysis/SKILL.md"
+  ],
+  "instruction_before": "- 泛问审批率、通过率、转化率或好人率时默认使用 AppsFlyer UV，并主动说明；只问申请量、审批量等模糊数量时，先解释 event count 会重复计算同一用户的多次动作，再询问用户要次数还是人数。",
+  "instruction_after": "- 泛问审批率、通过率、转化率或好人率时默认使用 AppsFlyer UV，并主动说明；只问申请量、审批量等模糊数量时，可并列查询次数与人数并分别说明；只有用户意图无法通过并列展示满足时才追问，不把追问设为取数前置条件。",
+  "checks": {
+    "single_instruction_replacement": true,
+    "manifest_only_version_changed": true,
+    "all_runtime_oauth_tools_other_skills_byte_identical": true,
+    "release_hash_valid": true
+  },
+  "runtime_gate_evidence": "Inherited only for unchanged runtime. No claim of a new fresh-host or OAuth acceptance run."
+}
