@@ -1,22 +1,22 @@
 {
   "schema_version": "chatgrowing.public-marketplace-release.v1",
   "marketplace_name": "chatgrowing",
-  "recommended_plugin_version": "0.4.1",
-  "source_git_commit": "22bb223d130414cf90f0d24cbb6ce70fa6055810",
-  "artifact_sha256": "2b55cb37458d23e7d4d1c231a938e472abc0b9cd061f55fdb8471152b5c0296f",
+  "recommended_plugin_version": "0.4.2",
+  "source_git_commit": "28ab8cc2a540f04047def466e0da3f96db8b0d31",
+  "artifact_sha256": "c7daf440b77386be37226e842b36cdf8e6c570e0e9091b2a4911b8578a79c35d",
   "tool_schema_version": "AdsCapabilityMcpPublicSchema.v3",
   "tool_schema_fingerprint": "d9c13266a22bf5c512ff19d9086886cc5becec147b6c75c4141b4d5e95b7b702",
-  "skill_bundle_fingerprint": "992d2a2716192bf3a77d6d7816fd72e34e65bc18493e4d534af28d9e4ced9ef8",
+  "skill_bundle_fingerprint": "8164311e39c2029b38e9c64968bdd61a7357730720eef884ae2dedbb386f6299",
   "mcp_resource": "https://chatgrowing.com/mcp",
   "oauth_scopes": [
     "ads.read"
   ],
   "oauth_client_id_metadata_document": "https://chatgpt.com/oauth/codex/npgGhq3mjJ9W/client.json",
   "compatibility_policy": "current_and_previous_stable_plugin",
-  "rollback_plugin_version": "0.4.0+codex.20260913100000",
+  "rollback_plugin_version": "0.4.1",
   "publication_gates_status": "passed_incremental_skill_delta",
   "publication_gate_evidence_schema": "chatgrowing.skill-delta-evidence.v1",
-  "publication_gate_evidence_sha256": "975dd6ffa489b6a0cb36c23b62bff1cbfdeb1ef0c88ac94c2c3765b65e9450da",
+  "publication_gate_evidence_sha256": "eeb723e6143a42fa107145542bebaf215b7187bca1b43d920448d66375745e67",
   "update_contract": {
     "marketplace_snapshot": "refresh_git_marketplace",
     "installed_plugin": "self_hosted_git_marketplace",
@@ -24,5 +24,5 @@
     "existing_install_behavior": "unchanged_until_explicit_plugin_update",
     "user_notification": "operator_gated"
   },
-  "rollback_marketplace_commit": "22bfc79decb35bbe0e946c74ceb4172e8a5d7b09"
+  "rollback_marketplace_commit": "8eeaac4a11c4f7a5ceb8bcf1e894ce88f201343d"
 }
