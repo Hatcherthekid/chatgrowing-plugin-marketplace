@@ -18,12 +18,21 @@ description: 自由查询和分析当前授权广告数据，支持汇总、比�
 1. 把自然语言问题拆成范围、日期、grain、指标、维度、比较和期望输出。
 2. 按服务端 guidance 发现 catalog、正式定义、可查询字段与 source authority；不在 Skill 记忆工具清单、source ID、公式或平台对象树。
 3. 先执行最小充分查询；大范围问题先汇总或排序，再选择有信息增量的对象下钻。
+   - 用户说“某渠道 / media source / PID”并给出任意名称时，把名称当作 AppsFlyer 事实字段 `media_source` 的动态值，不能拿它搜索 Catalog 的 source/provider。Catalog 只发现稳定的数据产品和字段；Catalog 无匹配不能证明该媒体来源无数据或无权限。
+   - `media_source` 不使用枚举或逐渠道登记。先按用户给出的完整值查询；只有缩写或精确值无结果时，按 `app + media_source` 查询当前授权的全部 AppsFlyer App，基于服务端返回的原始值给出候选。候选不唯一时说明歧义，不猜映射。未指定 App 的存在性/覆盖问题必须扫完全部 AppsFlyer App 资源及资源分页。
 4. 每次结果都检查 coverage、freshness、limitations、definition evidence 和 continuation。
 5. 已从 capability context 选定物理资源时，数据健康调用必须携带对应 `resource_refs`，避免把单账户检查扩大为同渠道全部授权账户扫描。
 6. 续查只能使用服务端返回的 opaque references、父对象 keys 与允许的 transition；不同投放结构可返回不同关系、切分或 profile。
 7. `next_resource_cursor` 表示授权物理资源尚未扫描完，必须继续资源分页后才能声称“全部账户”；它与对象下钻 continuation 不同。
 8. 需要复杂计算时，在 Host 允许的 Workspace SQL/Python 框架内处理已返回证据，不越权读取底层存储。
 9. 先回答结论，再给时间范围、证据、口径、反证、限制和下一步。
+
+## 部分数据的回答
+
+- 先回答查询已经返回的事实，再说明缺失；来源失败或partial不能升级成整个问题cannot_judge。
+- 行内metric_availability仅描述事实字段观测，不认证采集是否完整；采集是否失败读取独立source_receipts，没行不等于0或失败。
+- metric_comparisons提供服务端计算的共同观测范围结果与分子、分母、输入字段、纳入/排除行数。可按用户问题引用，但必须说明这是部分范围，不是完整账户/App总比率；不同指标或日期不能默认范围一致。
+- 需要具体账户/Campaign范围时继续按授权实体查询；不得自行重算比率、根据名称归属数据或用共同观测结果替换全范围值。某个比率不能判断不影响其他基础数据的回答。
 
 ## 计数口径
 
