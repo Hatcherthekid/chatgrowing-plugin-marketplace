@@ -27,8 +27,10 @@
   "publication_gate_evidence_schema": "chatgrowing.publication-gate-evidence.v4",
   "publication_gate_evidence_sha256": "319c300153618fff2e7619c6fad83d8e8953fb1576fbb36acb76df1699946a51",
   "update_contract": {
-    "marketplace_snapshot": "refresh_git_marketplace",
-    "installed_plugin": "self_hosted_git_marketplace",
+    "marketplace_snapshot": "source_type_aware",
+    "git_source": "marketplace_upgrade_then_plugin_add",
+    "local_source": "verified_https_snapshot_then_plugin_add",
+    "installed_plugin": "self_hosted_marketplace",
     "automatic_installed_plugin_update": false,
     "existing_install_behavior": "unchanged_until_explicit_plugin_update",
     "user_notification": "operator_gated"

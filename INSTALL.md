@@ -29,7 +29,7 @@ Windows 从当前桌面应用安装目录定位其捆绑 CLI，不假设与 macO
 
 首次登录前检查 Host 自动续期。2026-09-20 对桌面捆绑 0.155.0-alpha.9 的实测表明：未启用刷新协调时，多连接会重用已轮换的凭据；启用后多连接、刷新后超时重建通过。只读取 `features list` 中的 `mcp_oauth_refresh_coordination` 一行，不读取凭据。若该版本支持且为 false，由安装 Agent 使用官方 `features enable mcp_oauth_refresh_coordination` 开启并回读；它修改 Host 的全局刷新协调选项，需明确告知。已为 true 时不重复修改，也不要求重新登录。旧版本即使识别选项也不保证实现生效；版本和真实续期验收分别记录。未知版本/选项不可用时报告 Host 兼容性缺口，不能循环重连或擅自关闭 Auth0 轮换保护。
 
-- 已安装且启用、URL 为 `https://chatgrowing.com/mcp`：跳到连接验证，不先重新登录。
+- 已安装且启用、URL 为 `https://chatgrowing.com/mcp`：普通使用跳到连接验证，不先重新登录；用户明确要求更新或版本落后时，先完成下方来源感知更新，再核对实际安装版本。
 - 已有来源但未安装：复用实际 marketplace 名称，进入安装步骤。
 - 已有 Auxeo：保留现场，不删除旧配置或凭据；单独安装 ChatGrowing，验证后再讨论退役。
 - 同名 server 指向其他 URL、来源或身份冲突：报告冲突位置，确认归属后处理，不自动覆盖。
@@ -63,19 +63,43 @@ Windows 从当前桌面应用安装目录定位其捆绑 CLI，不假设与 macO
 
 若坚持使用已有 Git 来源且 Git 不可用，先用 Host 报告的运行时 Git 或 `scripts/preflight.sh --git /verified/path` 检查。禁止为首次安装 ChatGrowing 默认执行 `xcode-select --install`；新安装直接走 HTTPS 快照流程。
 
-## 3. 已有 Git 来源的安装路径（HTTPS 快照安装成功后跳过）
+## 3. 更新：先区分来源，再更新实际插件
+
+以 `plugin marketplace list --json` 的 `marketplaceSource.sourceType` 为准。目录名含 `-git` 不代表 Git 来源。`marketplace upgrade` 只适用于 Git 来源；不存在 `plugin update` 命令，不要猜测。
+
+### 已登记为 Git
+
+Canonical 仓库为 `https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace.git`。复用实际返回且指向该仓库的 `MARKETPLACE`，不要每次重新登记：
 
 ```bash
-"$BUNDLED_CODEX" plugin marketplace add https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace.git --ref main
-"$BUNDLED_CODEX" plugin marketplace list --json
+"$BUNDLED_CODEX" plugin marketplace upgrade "$MARKETPLACE" --json
+"$BUNDLED_CODEX" plugin add "chatgrowing@$MARKETPLACE" --json
 "$BUNDLED_CODEX" plugin list --marketplace "$MARKETPLACE" --json
-"$BUNDLED_CODEX" plugin add "chatgrowing@$MARKETPLACE"
 ```
 
-`MARKETPLACE` 必须取上一条实际返回、且指向上述 canonical HTTPS 仓库的名称。
-若该桌面版本未提供 `plugin add`，使用桌面插件目录安装这个来源中的 ChatGrowing；不要手写缓存或猜命令。
-所有路径与变量须加引号。公开仓库不使用个人 SSH alias，也不向用户索要 GitHub 凭据。
-下载错误先按 DNS、TLS、连接超时、Git 不可用分别诊断；仅使用已确认属于用户的代理，不试探随机代理端口。
+刷新市场只更新可用版本；再次 `plugin add` 才更新实际安装。保留相同插件身份，不先移除插件或市场，不 logout，不重新授权 Google。若当前 CLI 不支持这些命令，报告具体兼容性缺口，不手写缓存。
+
+### 已登记为 local
+
+不要执行 `marketplace upgrade`，不要因为路径叫 `chatgrowing-git` 而尝试 Git 修复。由 HTTPS 安装器拥有的来源使用：
+
+```bash
+/bin/bash /absolute/path/install_without_git.sh --codex "$BUNDLED_CODEX" --update-owned-source
+```
+
+旧 local 来源（包括名为 `chatgrowing-git` 的目录）由安装 Agent 从 CLI 返回值取得实际绝对路径并核验后运行：
+
+```bash
+/bin/bash /absolute/path/install_without_git.sh --codex "$BUNDLED_CODEX" --migrate-local-source "$VERIFIED_LOCAL_SOURCE"
+```
+
+这会校验来源仅包含 ChatGrowing 分发、插件名称及官方 MCP 地址，再在原路径换入 HTTPS 快照，执行官方 `plugin add`。市场名称、路径和插件身份保持不变；原分发目录保留。拒绝 Git checkout、Host 缓存、链接或不明内容，不删除重建市场，不手改已安装缓存，也不改授权。后续更新可用 `--update-owned-source`。下载或校验失败保留旧来源；安装步骤失败则回滚来源目录，但必须重新回读实际安装版本，不能宣称 CLI 的部分写入也被完全回滚。
+
+### 下载失败与连接失败分别处理
+
+HTTPS 快照不使用 raw.githubusercontent.com，但仍需要访问 GitHub API 和 codeload。普通 GitHub 页面可访问不证明这些下载域名可访问。TLS 证书失败不得通过 `curl -k` 或关闭验证绕过；没有验证可用的下载来源时，保留旧版并明确下载未完成，不重复登录或宣称升级成功。
+
+升级结束核对实际 installed version、enabled 和同一 MCP URL。旧任务未刷新工具时，只重载相关工具或新建任务验证，不能把它称为需要再次登录。素材助手准备是独立步骤，远程查询不依赖本地 Python。更新成功也不证明另一设备的 MCP 传输故障已修复。
 
 ## 4. 验证连接，再按需授权
 
