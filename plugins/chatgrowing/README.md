@@ -1,8 +1,10 @@
 # ChatGrowing Agent Plugin
 
-ChatGrowing is a read-only advertising data plugin for Codex. It connects Codex to the
-ChatGrowing Remote MCP for governed Meta, Google Ads, TikTok Ads, and AppsFlyer queries,
-analysis, monitoring, and reporting.
+ChatGrowing connects Codex to one governed Remote Agent Gateway for authorized Meta,
+Google Ads, TikTok Ads, and AppsFlyer reading, analysis, monitoring, and reporting. The
+same ChatGrowing login can expose permitted material and YouTube actions; those actions
+remain protected by server-side capabilities, resource bindings, explicit confirmation,
+idempotency, and audit.
 
 ## Install
 

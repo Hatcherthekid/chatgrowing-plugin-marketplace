@@ -1,7 +1,7 @@
 {
   "name": "chatgrowing",
-  "version": "0.4.3",
-  "description": "ChatGrowing\uff1a\u7531\u670d\u52a1\u7aef\u80fd\u529b\u5408\u540c\u9a71\u52a8\u7684\u53ea\u8bfb\u5e7f\u544a\u67e5\u8be2\u3001\u81ea\u7531\u5206\u6790\u4e0e\u53d7\u6cbb\u7406\u914d\u7f6e\u8349\u6848\u63d2\u4ef6\u3002",
+  "version": "0.4.4",
+  "description": "ChatGrowing：由服务端能力合同驱动的只读广告查询、自由分析与受治理配置草案插件。",
   "author": {
     "name": "ChatGrowing"
   },
@@ -18,8 +18,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "ChatGrowing",
-    "shortDescription": "\u5728\u5f53\u524d\u6388\u6743\u8303\u56f4\u5185\u81ea\u7531\u67e5\u8be2\u548c\u5206\u6790\u5e7f\u544a\u6570\u636e\uff0c\u5e76\u5f62\u6210\u914d\u7f6e\u8349\u6848",
-    "longDescription": "ChatGrowing Plugin \u53ea\u4fdd\u5b58\u7a33\u5b9a\u7684\u53ea\u8bfb bootstrap\u3001OAuth \u8d44\u6e90\u548c\u610f\u56fe\u7ea7 Skills\uff1b\u53ef\u7528\u8d44\u6e90\u3001\u5b57\u6bb5\u3001\u6307\u6807\u53e3\u5f84\u3001\u67e5\u8be2\u8def\u5f84\u3001\u4e0b\u94bb\u5173\u7cfb\u3001\u5206\u6790 guidance \u4ee5\u53ca\u62a5\u544a\u3001\u76d1\u63a7\u548c\u4ea4\u4ed8\u80fd\u529b\u7684\u53ef\u7528\u72b6\u6001\u4e0e\u9650\u5236\uff0c\u5747\u7531 ChatGrowing \u670d\u52a1\u7aef\u6309\u5f53\u524d\u7528\u6237\u6743\u9650\u52a8\u6001\u63d0\u4f9b\u3002\u82e5 Codex Host \u80fd\u8bfb\u53d6 MCP Resources \u4f46\u672a\u5411\u4efb\u52a1\u62ab\u9732\u81ea\u5b9a\u4e49 Tools\uff0c\u670d\u52a1\u7aef\u63d0\u4f9b\u5171\u4eab\u76f8\u540c\u6388\u6743\u548c\u67e5\u8be2\u5b9e\u73b0\u7684 Resource Bridge \u6062\u590d\u5165\u53e3\u3002Ads Read \u672a\u53d1\u5e03\u7684 Control \u80fd\u529b\u53ea\u5f62\u6210\u8349\u6848\uff0c\u4e0d\u58f0\u79f0\u5df2\u914d\u7f6e\u6216\u5df2\u53d1\u9001\u3002\u65e5\u5e38\u670d\u52a1\u7aef\u66f4\u65b0\u901a\u5e38\u53ea\u9700\u65b0\u5efa\u4efb\u52a1\u6216\u91cd\u8fde\uff0c\u4e0d\u8981\u6c42\u91cd\u65b0\u5b89\u88c5 Plugin\u3002\u5e7f\u544a\u5e73\u53f0 Write \u672a\u5f00\u653e\u3002",
+    "shortDescription": "在当前授权范围内自由查询和分析广告数据，并形成配置草案",
+    "longDescription": "ChatGrowing Plugin 只保存稳定的只读 bootstrap、OAuth 资源和意图级 Skills；可用资源、字段、指标口径、查询路径、下钻关系、分析 guidance 以及报告、监控和交付能力的可用状态与限制，均由 ChatGrowing 服务端按当前用户权限动态提供。若 Codex Host 能读取 MCP Resources 但未向任务披露自定义 Tools，服务端提供共享相同授权和查询实现的 Resource Bridge 恢复入口。Ads Read 未发布的 Control 能力只形成草案，不声称已配置或已发送。日常服务端更新通常只需新建任务或重连，不要求重新安装 Plugin。广告平台 Write 未开放。",
     "developerName": "ChatGrowing",
     "category": "Data & Analytics",
     "capabilities": [
@@ -27,9 +27,9 @@
       "Interactive"
     ],
     "defaultPrompt": [
-      "\u5e2e\u6211\u770b\u770b\u4eca\u5929\u6295\u653e\u600e\u4e48\u6837\uff0c\u82b1\u8d39\u3001CPS \u548c\u901a\u8fc7\u7387\u76f8\u6bd4\u6628\u5929\u4e0e\u8fd1 7 \u65e5\u6709\u4ec0\u4e48\u53d8\u5316",
-      "\u6838\u5bf9 AppsFlyer \u4e0e\u5a92\u4f53\u5e73\u53f0\u8f6c\u5316\u3001\u57cb\u70b9\u548c\u5f52\u56e0\u5dee\u5f02\uff0c\u5e76\u627e\u51fa\u6700\u503c\u5f97\u7ee7\u7eed\u5206\u6790\u7684\u95ee\u9898",
-      "\u68c0\u67e5\u9884\u7b97\u3001\u51fa\u4ef7\u548c\u72b6\u6001\u98ce\u9669\uff0c\u5e76\u57fa\u4e8e\u5f53\u524d\u6388\u6743\u6570\u636e\u5f62\u6210\u6709\u8bc1\u636e\u548c\u9650\u5236\u8bf4\u660e\u7684\u62a5\u8868\u8349\u6848"
+      "帮我看看今天投放怎么样，花费、CPS 和通过率相比昨天与近 7 日有什么变化",
+      "核对 AppsFlyer 与媒体平台转化、埋点和归因差异，并找出最值得继续分析的问题",
+      "检查预算、出价和状态风险，并基于当前授权数据形成有证据和限制说明的报表草案"
     ],
     "brandColor": "#16D768",
     "composerIcon": "./assets/composer-icon.png",

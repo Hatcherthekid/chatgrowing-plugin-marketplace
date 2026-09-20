@@ -1291,6 +1291,18 @@ class CatalogSourceDescription(PublicContractModel):
         return self
 
 
+class SourceCollectionReceipt(PublicContractModel):
+    source: PublicIdentifier
+    component: PublicIdentifier
+    account_id: PublicIdentifier
+    app: Optional[PublicIdentifier] = None
+    target_date: date
+    status: PublicIdentifier
+    reason_code: Optional[ShortText] = None
+    updated_at: Optional[ShortText] = None
+    next_retry_at: Optional[ShortText] = None
+
+
 class DataHealthRecord(PublicContractModel):
     source_id: PublicIdentifier
     resource_ref: Optional[PublicIdentifier] = None
@@ -1305,6 +1317,8 @@ class DataHealthRecord(PublicContractModel):
     timezone: Optional[ShortLabel] = None
     lag_days: Optional[int] = Field(default=None, ge=0)
     sync_status: Optional[PublicIdentifier] = None
+    source_receipts: list[SourceCollectionReceipt] = Field(default_factory=list, max_length=100)
+    source_receipts_truncated: bool = False
     mapping_status: Optional[ShortLabel] = None
     limitations: list[ShortText] = Field(default_factory=list, max_length=50)
 
@@ -1572,6 +1586,8 @@ def _validate_payload_presence(status: EvidenceStatus, has_payload: bool, field_
 
 
 class RowEvidenceEnvelope(AdsEvidenceEnvelope):
+    source_receipts: list[SourceCollectionReceipt] = Field(default_factory=list, max_length=100)
+    source_receipts_truncated: bool = False
     source_id: Optional[PublicIdentifier] = None
     executed_scope: Optional[ExecutedScope] = None
     data_window: Optional[DataWindow] = None
@@ -1595,6 +1611,7 @@ class RowEvidenceEnvelope(AdsEvidenceEnvelope):
     ] = None
     range_deduplicated: Optional[bool] = None
     counting_semantics_disclosure: Optional[ShortText] = None
+    metric_counting_semantics: dict[FieldName, CountingSemantics] = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def validate_row_evidence(self) -> "RowEvidenceEnvelope":

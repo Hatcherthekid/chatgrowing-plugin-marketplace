@@ -29,7 +29,6 @@ _LAZY_MODULES = (
     "ads_tree_runtime_adapter",
     "ads_hypothesis_runtime",
     "ads_diagnosis_card_builder",
-    "ads_analysis_calculator_registry",
     "ads_meta_scope_guard",
     "ads_attribution_scope_reviewer",
     "ads_delivery_target_dictionary",

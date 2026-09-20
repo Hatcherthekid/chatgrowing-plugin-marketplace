@@ -1,0 +1,18 @@
+interface:
+  display_name: "YouTube 素材运营"
+  short_description: "管理授权频道、视频同步、上传、修改、删除、模板、批量和恢复"
+  icon_small: "./assets/chatgrowing-icon.png"
+  icon_large: "./assets/chatgrowing-icon.png"
+  brand_color: "#16D768"
+  default_prompt: "使用 $youtube-material-operations 管理当前授权的 YouTube 频道和素材任务。"
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "chatgrowing_ads_read"
+      description: "ChatGrowing Ads Read Remote MCP server"
+      transport: "streamable_http"
+      url: "https://chatgrowing.com/mcp"
+
+policy:
+  allow_implicit_invocation: true
