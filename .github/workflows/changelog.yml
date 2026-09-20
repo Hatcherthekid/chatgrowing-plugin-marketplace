@@ -29,4 +29,16 @@ jobs:
             -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
             -o UserKnownHostsFile="$work_dir/known_hosts" -o ConnectTimeout=20 \
             -o ServerAliveInterval=15 -o ServerAliveCountMax=3 \
-            "root@$DEPLOY_HOST" sync-changelog
+            "root@$DEPLOY_HOST" sync-changelog > "$work_dir/receipt.json"
+          cat "$work_dir/receipt.json"
+          curl --fail --silent --show-error --retry 3 --retry-delay 3 \
+            --max-time 30 -A 'Mozilla/5.0' https://chatgrowing.com/changelog/ > "$work_dir/page.html"
+          python3 - "$work_dir" <<'PYCODE'
+          import json, pathlib, re, sys
+          folder = pathlib.Path(sys.argv[1])
+          expected = json.loads((folder / 'receipt.json').read_text())['versions']
+          actual = re.findall(r'data-version="([^"]+)"', (folder / 'page.html').read_text())
+          assert actual == expected, 'Live changelog differs from generated complete history'
+          assert '0.1.0' in actual, 'Initial release history missing'
+          print('Live history verified:', len(actual), 'versions')
+          PYCODE
