@@ -14,7 +14,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlencode, urlsplit
 
 import httpx
-from domains.ads.contracts.material_library import MaterialError
+from .protocol import MaterialError
 
 LOCAL_PORT = 18976
 LOCAL_AUTH_CALLBACK = f'http://127.0.0.1:{LOCAL_PORT}/oauth/chatgrowing/callback'

@@ -9,14 +9,14 @@ CODE=Path(__file__).resolve().parents[1]
 if str(CODE) not in sys.path:sys.path.insert(0,str(CODE))
 import httpx
 from mcp.server.fastmcp import FastMCP
-from domains.ads.contracts.material_library import MaterialError
-from domains.ads.mcp.material_source_client import MaterialSourceClient, source_manifest
+from shared.material_source.protocol import MaterialError
+from shared.material_source.client import MaterialSourceClient, source_manifest
 
 
 def build_server(*, environ=None, inspector=None):
     env=os.environ if environ is None else environ
     server=FastMCP('chatgrowing-material-local')
-    from domains.ads.mcp.material_local_auth import MaterialLocalAuth
+    from shared.material_source.auth import MaterialLocalAuth
     origin=env.get('CHATGROWING_MATERIAL_SERVICE_ORIGIN') or 'https://chatgrowing.com'
     auth=MaterialLocalAuth(origin)
 

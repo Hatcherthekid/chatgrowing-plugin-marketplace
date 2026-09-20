@@ -7,9 +7,9 @@ import stat
 from urllib.parse import urlsplit
 
 import httpx
-from domains.ads.contracts.material_library import MaterialError, digest
-from domains.ads.services.material_remote_sources import CHUNK_SIZE, MAX_CHUNKS
-from domains.ads.services.material_file_store import FFmpegVideoInspector, LocalMaterialFileStore
+from .protocol import MaterialError, digest
+from .protocol import CHUNK_SIZE, MAX_CHUNKS
+from .inspection import FFmpegVideoInspector, inspect_image
 
 
 def source_manifest(path, *, inspector=None):
@@ -25,7 +25,7 @@ def source_manifest(path, *, inspector=None):
         width,height,duration=(inspector or FFmpegVideoInspector()).inspect(path)
         mime='video/mp4'
     elif path.suffix.lower() in ('.jpg','.jpeg','.png','.webp'):
-        width,height,mime=LocalMaterialFileStore._inspect_image(path,path.suffix.lower())
+        width,height,mime=inspect_image(path,path.suffix.lower())
         duration=None
     else:
         raise MaterialError('material_file_invalid',422)
@@ -74,7 +74,7 @@ class MaterialSourceClient:
     async def register_many(self, paths, *, request_key, inspector=None):
         if not isinstance(paths,(list,tuple)) or not 1<=len(paths)<=100:
             raise MaterialError('material_source_batch_invalid',422)
-        from domains.ads.contracts.material_library import bounded_text
+        from .protocol import bounded_text
         bounded_text(request_key,limit=128)
         results=[]
         for index,path in enumerate(paths):
