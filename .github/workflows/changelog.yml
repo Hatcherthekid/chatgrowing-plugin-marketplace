@@ -1,0 +1,32 @@
+name: Sync website changelog
+on:
+  release:
+    types: [published, edited, deleted, unpublished, released]
+  workflow_dispatch:
+permissions: {}
+concurrency:
+  group: website-changelog
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Rebuild complete release history on the website
+        env:
+          DEPLOY_KEY: ${{ secrets.CHANGELOG_DEPLOY_KEY }}
+          DEPLOY_HOST: ${{ secrets.CHANGELOG_DEPLOY_HOST }}
+          KNOWN_HOSTS: ${{ secrets.CHANGELOG_KNOWN_HOSTS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          work_dir=$(mktemp -d)
+          trap 'rm -rf "$work_dir"' EXIT
+          printf '%s\n' "$DEPLOY_KEY" > "$work_dir/key"
+          printf '%s\n' "$KNOWN_HOSTS" > "$work_dir/known_hosts"
+          chmod 600 "$work_dir/key" "$work_dir/known_hosts"
+          ssh -T -i "$work_dir/key" \
+            -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$work_dir/known_hosts" -o ConnectTimeout=20 \
+            -o ServerAliveInterval=15 -o ServerAliveCountMax=3 \
+            "root@$DEPLOY_HOST" sync-changelog

@@ -1,0 +1,220 @@
+[
+  {
+    "version": "0.4.3",
+    "date": "2026-09-15T16:14:12+08:00",
+    "title": "Google sign-in callback correction",
+    "body": "Corrected the Material OAuth callback client used by the 0.4.3 plugin.",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/commit/093eda3822675fc1e2797bb001867d5977584619",
+    "kind": "marketplace"
+  },
+  {
+    "version": "0.4.2",
+    "date": "2026-09-15T15:02:17+08:00",
+    "title": "Analysis with partial data",
+    "body": "Added guidance for explaining available observations when data is partial and discovering sources dynamically.",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/commit/28ab8cc2a540f04047def466e0da3f96db8b0d31",
+    "kind": "marketplace"
+  },
+  {
+    "version": "0.4.1",
+    "date": "2026-09-15T13:57:14+08:00",
+    "title": "Event and user counts together",
+    "body": "Allowed event counts and user counts to be analyzed together while preserving their distinct meanings.",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/commit/22bb223d130414cf90f0d24cbb6ce70fa6055810",
+    "kind": "marketplace"
+  },
+  {
+    "version": "0.4.0+codex.20260913100000",
+    "date": "2026-09-14T09:57:56+08:00",
+    "title": "Material operations and local files",
+    "body": "Introduced the Material Actions connection and a bundled helper for user-selected local files. The separate Material login used by this version is superseded by 0.4.4.",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/commit/22bfc79decb35bbe0e946c74ceb4172e8a5d7b09",
+    "kind": "marketplace"
+  },
+  {
+    "version": "0.3.3",
+    "date": "2026-09-03T16:03:46+08:00",
+    "title": "Advertising analysis plugin",
+    "body": "Published the read-only advertising analysis plugin, organization-scoped access and installation instructions.",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/commit/8a0c0fe7d248bc95bca5306f613440ce7bb5bc06",
+    "kind": "marketplace"
+  },
+  {
+    "version": "0.3.0",
+    "date": "2026-08-31T00:00:00Z",
+    "date_label": "August 31, 2026",
+    "title": "ChatGrowing 0.3.0",
+    "body": "A new identity and a simpler path from an advertising question to a governed answer inside Codex.\n\n- Introduced the ChatGrowing name, visual identity, Plugin namespace, OAuth resource, and customer-facing product language.\n- Separated everyday queries from long-lived Artifacts. Users can ask ordinary questions and continue drilling down without first publishing an Evidence Artifact.\n- Kept explicit Tool dependencies and added a discoverable Resource Bridge recovery contract for compatible Codex sessions where custom Tools are not exposed.\n- Consolidated the public Remote surface around 13 governed read-only Tools and seven intent-level Remote Skills.\n- Preserved request-scoped organization and resource authorization. The release does not modify campaigns, budgets, bids, status, or creatives.\n0.3.0 is currently a release candidate and has not yet been published to the public Marketplace.\n",
+    "kind": "archive",
+    "status": "Release candidate",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/blob/main/website/history.json",
+    "source": "Archived website 2026-09-01; source revision 3c1f7223",
+    "anchor": "v0-3-0"
+  },
+  {
+    "version": "0.2.3",
+    "date": "2026-08-25T00:00:00Z",
+    "date_label": "August 25, 2026",
+    "title": "ChatGrowing 0.2.3",
+    "body": "A recovery path for Codex sessions where custom Tools are unavailable.\n\n- Added Resource Bridge access backed by the same read-only authorization and query implementation.\n- Published a fixed recovery contract that compatible Hosts can discover through MCP Resources.\n- Allowed approved read-only queries to run through parameterized Resource Templates without creating a separate query engine.\n- Kept authorization, account scope, input validation, and evidence behavior identical to normal Tool calls.\n- Added protocol observability to distinguish initialization, Tool discovery, Resource discovery, and query execution failures.\nThe server-side recovery capability was deployed, but the 0.2.3 Plugin was not publicly released.\n",
+    "kind": "archive",
+    "status": "Unpublished candidate",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/blob/main/website/history.json",
+    "source": "Archived website 2026-09-01; source revision 3c1f7223",
+    "anchor": "v0-2-3"
+  },
+  {
+    "version": "0.2.2",
+    "date": "2026-08-25T00:00:00Z",
+    "date_label": "August 25, 2026",
+    "title": "ChatGrowing 0.2.2",
+    "body": "More reliable Tool discovery in Codex.\n\n- Declared the remote Ads Read Tool dependency for every published Skill.\n- Improved how Codex connects analysis, monitoring, configuration, and reporting Skills to the remote MCP.\n- Added release checks for the expected server name, Streamable HTTP transport, and Remote MCP URL.\n- Kept all seven published Skills on the same governed Ads Read capability instead of duplicating query logic inside each Skill.",
+    "kind": "archive",
+    "status": "Public release",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/blob/main/website/history.json",
+    "source": "Archived website 2026-09-01; source revision 3c1f7223",
+    "anchor": "v0-2-2"
+  },
+  {
+    "version": "0.2.1",
+    "date": "2026-08-24T00:00:00Z",
+    "date_label": "August 24, 2026",
+    "title": "ChatGrowing 0.2.1",
+    "body": "Simpler authentication and evidence-first custom reports.\n\n- Moved Codex authentication to one allowlisted CIMD OAuth client.\n- Added user-defined reports based on explicitly published evidence.\n- Preserved account scope and metric definitions from query to rendered report.\n- Added report preview, Report Run, rendered asset, and Feishu projection-plan outputs without adding advertising write access.\n- Required every report input to resolve to resources visible to the current signed-in member.",
+    "kind": "archive",
+    "status": "Public release",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/blob/main/website/history.json",
+    "source": "Archived website 2026-09-01; source revision 3c1f7223",
+    "anchor": "v0-2-1"
+  },
+  {
+    "version": "0.2.0",
+    "date": "2026-08-21T00:00:00Z",
+    "date_label": "August 21, 2026",
+    "title": "ChatGrowing 0.2.0",
+    "body": "Server-driven reports and shareable report images.\n\n- Added server-managed report definitions and guidance.\n- Added long-image rendering for governed reports.\n- Kept report availability and formats up to date without changing the thin Plugin.\n- Added binary report-resource reading so rendered images could be retrieved through the governed MCP flow.\n- Established the server-driven bootstrap pattern used to deliver current capability and limitation guidance.",
+    "kind": "archive",
+    "status": "Public release",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/blob/main/website/history.json",
+    "source": "Archived website 2026-09-01; source revision 3c1f7223",
+    "anchor": "v0-2-0"
+  },
+  {
+    "version": "0.1.9",
+    "date": "2026-08-21T00:00:00Z",
+    "date_label": "August 21, 2026",
+    "title": "ChatGrowing 0.1.9",
+    "body": "Flexible analysis beyond fixed questions.\n\n- Added governed follow-up analysis and dynamic continuation.\n- Added cross-source compatibility checks.\n- Improved multi-account exploration while preserving authorization scope.\n- Added capability context and Catalog guidance so queries could be planned from available fields, metrics, grains, and breakdowns.\n- Added constrained SQL and Python analysis over authorized query results for calculations not covered by a fixed summary.",
+    "kind": "archive",
+    "status": "Public release",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/blob/main/website/history.json",
+    "source": "Archived website 2026-09-01; source revision 3c1f7223",
+    "anchor": "v0-1-9"
+  },
+  {
+    "version": "0.1.8",
+    "date": "2026-08-19T00:00:00Z",
+    "date_label": "August 19, 2026",
+    "title": "ChatGrowing 0.1.8",
+    "body": "Native Codex authentication without a fixed local callback.\n\n- Removed the previously fixed OAuth client and callback assumptions.\n- Added Authorization Code with PKCE for public-client authentication.\n- Allowed the Codex Host to register the callback used by each connection.\n- Hardened issuer, audience, resource, and scope validation for the Remote MCP.\nThis historical dynamic-registration approach was later replaced by the single CIMD client model in 0.2.1.\n",
+    "kind": "archive",
+    "status": "Public release",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/blob/main/website/history.json",
+    "source": "Archived website 2026-09-01; source revision 3c1f7223",
+    "anchor": "v0-1-8"
+  },
+  {
+    "version": "0.1.7",
+    "date": "2026-08-18T00:00:00Z",
+    "date_label": "August 18, 2026",
+    "title": "ChatGrowing 0.1.7",
+    "body": "More dependable sessions across the web product and Codex Plugin.\n\n- Stabilized OAuth login and session handling for Remote MCP requests.\n- Improved access checks when moving between Dashboard, ad-management, and Plugin workflows.\n- Hardened the public release builder and authentication configuration validation.\n- Reduced false authorization failures caused by session transitions.",
+    "kind": "archive",
+    "status": "Public release",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/blob/main/website/history.json",
+    "source": "Archived website 2026-09-01; source revision 3c1f7223",
+    "anchor": "v0-1-7"
+  },
+  {
+    "version": "0.1.6",
+    "date": "2026-08-18T00:00:00Z",
+    "date_label": "August 18, 2026",
+    "title": "ChatGrowing 0.1.6",
+    "body": "Session recovery for interrupted or expired authenticated requests.\n\n- Added a controlled retry path for requests that encounter an expired API session.\n- Improved authenticated fetch behavior so users could recover without restarting the entire workflow.\n- Pinned the then-current Codex OAuth configuration to reduce client mismatch.",
+    "kind": "archive",
+    "status": "Public release",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/blob/main/website/history.json",
+    "source": "Archived website 2026-09-01; source revision 3c1f7223",
+    "anchor": "v0-1-6"
+  },
+  {
+    "version": "0.1.5",
+    "date": "2026-08-18T00:00:00Z",
+    "date_label": "August 18, 2026",
+    "title": "ChatGrowing 0.1.5",
+    "body": "Stricter access control and more dependable advertising semantics.\n\n- Hardened organization membership, resource binding, and account-scope enforcement.\n- Added stronger checks around app and advertiser selection.\n- Improved semantic profiles for metric definitions and source-specific interpretation.\n- Made unavailable, unauthorized, missing, partial, and genuine-zero results easier to distinguish.\n- Added release gates covering the combined access and semantic surface.",
+    "kind": "archive",
+    "status": "Public release",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/blob/main/website/history.json",
+    "source": "Archived website 2026-09-01; source revision 3c1f7223",
+    "anchor": "v0-1-5"
+  },
+  {
+    "version": "0.1.4",
+    "date": "2026-08-17T00:00:00Z",
+    "date_label": "August 17, 2026",
+    "title": "ChatGrowing 0.1.4",
+    "body": "Made the existing 0.1 product available as the first publicly installable thin Plugin.\n\n- Published the Plugin through a versioned public Git Marketplace.\n- Moved customer installation to a thin package containing stable Skills and Remote MCP configuration.\n- Kept private application code, credentials, tokens, and advertising data out of the public bundle.\n- Added immutable release checks and an explicit rollback version.",
+    "kind": "archive",
+    "status": "First public Plugin",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/blob/main/website/history.json",
+    "source": "Archived website 2026-09-01; source revision 3c1f7223",
+    "anchor": "v0-1-4"
+  },
+  {
+    "version": "0.1.3",
+    "date": "2026-08-17T00:00:00Z",
+    "date_label": "August 17, 2026",
+    "title": "ChatGrowing 0.1.3",
+    "body": "The first versioned Codex Plugin candidate for invited teammates.\n\n- Established the Plugin manifest, versioned Marketplace packaging, and Remote MCP connection.\n- Documented installation, explicit upgrade behavior, and teammate onboarding.\n- Added controlled private distribution before the first public thin-Plugin release.\n- Confirmed that Marketplace updates do not silently replace an already installed Plugin.",
+    "kind": "archive",
+    "status": "Private candidate",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/blob/main/website/history.json",
+    "source": "Archived website 2026-09-01; source revision 3c1f7223",
+    "anchor": "v0-1-3"
+  },
+  {
+    "version": "0.1.2",
+    "date": "2026-08-11T00:00:00Z",
+    "date_label": "August 11–12, 2026",
+    "title": "ChatGrowing 0.1.2",
+    "body": "Improved the reporting and governed paid-growth workflows introduced in 0.1.0.\n\n- Strengthened the governed paid-growth analysis flow and corrected early evidence-handling gaps.\n- Improved the Dashboard reporting workflow from source data to a reviewable output.\n- Added basic daily-report automation on top of the existing report foundation.\n- Expanded validation around report composition, delivery state, and operational reliability.",
+    "kind": "archive",
+    "status": "Product improvement",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/blob/main/website/history.json",
+    "source": "Archived website 2026-09-01; source revision 3c1f7223",
+    "anchor": "v0-1-2"
+  },
+  {
+    "version": "0.1.0",
+    "date": "2026-07-29T00:00:00Z",
+    "date_label": "July 29, 2026",
+    "title": "ChatGrowing 0.1.0",
+    "body": "The foundation of ChatGrowing. Most of the product’s core capabilities were established in this first version; later releases focused on making them more flexible, reliable, secure, and easier to distribute.\n\n### Advertising data in one governed layer\n\n- Connected the core data sources. Brought Meta Ads, Google Ads, TikTok Ads, and AppsFlyer into one read-only advertising data layer.\n- Unified delivery and attribution evidence. Used advertising platforms for spend, impressions, clicks, object status, budget, and bidding evidence, while AppsFlyer remained the attribution baseline for conversion outcomes.\n- Preserved source differences. Kept platform-specific hierarchy, metric grain, currency, status, and attribution meaning instead of flattening every source into one ambiguous table.\n### Core product functions\n\n- Natural-language advertising questions. Users could ask about spend, conversions, CPI/CPS, pass rate, account performance, campaigns, delivery, and changes over time.\n- Cross-channel summaries and comparisons. The system could compare platforms, accounts, apps, campaigns, and date windows using governed metric definitions.\n- Object-level drill-down. Users could move from a high-level result into provider-native Campaign, AdGroup or Ad Set, Ad, placement, asset, and other available evidence.\n- Performance diagnosis. The analysis flow separated what changed, possible explanations, supporting evidence, counter-evidence, and what still could not be concluded.\n- Configuration inspection. The product could read account hierarchy, delivery status, budget, bid, mapping, and available configuration evidence without changing the advertising platform.\n- Monitoring foundation. Data freshness, account status, delivery risk, balance or policy signals, and report-delivery conditions could be inspected and explained.\n- Report foundation. The same governed data and metric definitions could be composed into repeatable advertising summaries and operational reports.\n### Evidence and data-quality rules\n\n- Evidence before interpretation. Answers were grounded in a defined source, resource scope, date range, grain, metric contract, and freshness state.\n- Unknown was not treated as zero. Missing data, unavailable fields, incomplete mapping, insufficient permission, synchronization failure, and a real zero result remained different states.\n- Attribution dates stayed explicit. Actual event dates and D0/D1/D3 cohort views were not silently mixed.\n- Partial evidence stayed partial. The product did not promote incomplete hierarchy, asset, or attribution evidence into a confident conclusion.\n### Access and safety boundaries\n\n- Queries were restricted to the organization, resources, apps, and advertising accounts available to the current user.\n- The advertising MCP was read-only and did not modify campaigns, budgets, bids, status, targeting, or creatives.\n- The model did not receive direct database, production-server, credential, or secret access.\n- Recommendations remained reviewable suggestions; no advertising action was applied automatically.",
+    "kind": "archive",
+    "status": "Initial release",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/blob/main/website/history.json",
+    "source": "Archived website 2026-09-01; source revision 3c1f7223",
+    "anchor": "v0-1-0"
+  },
+  {
+    "version": "0.3.1",
+    "date": "2026-09-01T00:00:00Z",
+    "title": "Branded plugin packaging",
+    "body": "Prepared an immutable local ChatGrowing plugin package with the branded installation flow and Resource Bridge recovery contract.\n\nThis was a local candidate; public marketplace release was not confirmed in the historical record.",
+    "kind": "archive",
+    "status": "Local release candidate",
+    "url": "https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/blob/main/website/history.json",
+    "source": "Plugin manifest revision 37cbb11c and CHATGROWING_CODEX_PLUGIN_UPDATE_BEHAVIOR_V1"
+  }
+]
