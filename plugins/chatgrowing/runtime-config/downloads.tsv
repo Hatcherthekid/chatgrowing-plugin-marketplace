@@ -1,0 +1,10 @@
+Darwin-arm64	uv	https://github.com/astral-sh/uv/releases/download/0.12.17/uv-aarch64-apple-darwin.tar.gz	85f00cbdc6dd3e97eba4c31b4d014375a9fdfe8f570023b84e5102fc3456896b	uv-aarch64-apple-darwin/uv
+Darwin-arm64	ffmpeg	https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/ffmpeg-darwin-arm64	a90e3db6a3fd35f6074b013f948b1aa45b31c6375489d39e572bea3f18336584	-
+Darwin-arm64	ffprobe	https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/ffprobe-darwin-arm64	bb2db6f5d8cef919da12fbf592119a987202a8c060a886f3cab091f9cab90b64	-
+Darwin-arm64	license	https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/darwin-arm64.LICENSE	cb48bf09a11f5fb576cddb0431c8f5ed0a60157a9ec942adffc13907cbe083f2	-
+Darwin-arm64	media-readme	https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/darwin-arm64.README	05ba4b92c96605434b1aaae3eedf5a2c280c9607bf78ffca9a5b536d9af2dc6a	-
+Darwin-x86_64	uv	https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-apple-darwin.tar.gz	8dcf05a8c809bb3c471d2b614788ba27a6e41298fc8c31ac84b5f4339fd468e5	uv-x86_64-apple-darwin/uv
+Darwin-x86_64	ffmpeg	https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/ffmpeg-darwin-x64	ebdddc936f61e14049a2d4b549a412b8a40deeff6540e58a9f2a2da9e6b18894	-
+Darwin-x86_64	ffprobe	https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/ffprobe-darwin-x64	fa3add0ce901f7241abe0dfc0155d958fc834aca3f8ce61f87cc712ae669c1e0	-
+Darwin-x86_64	license	https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/darwin-x64.LICENSE	2e1d16c72fd74e12063776371da757322f8b77589386532f4fd8634bde7de1af	-
+Darwin-x86_64	media-readme	https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/darwin-x64.README	e88a0325f8e5b75210355e37341824f074d3cd82def2125be54c914b62848a36	-

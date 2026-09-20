@@ -5,9 +5,9 @@
 > 阅读 https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/blob/main/INSTALL.md，帮我安装 ChatGrowing。复用已有安装和有效授权，从未完成的步骤继续，最后查询一条我有权访问的真实广告数据。遇到故障请读取对应错误并处理，不要把“安装成功”或“登录成功”当成全部完成。
 
 这是给执行安装的 Codex 使用的完整流程。用户不需要 SSH 密钥、GitHub 用户名或完整 Xcode。
-当前采用 self-hosted Git marketplace，不依赖 OpenAI public-directory / curated Marketplace。
+当前采用 self-hosted marketplace（HTTPS 快照或已有 Git 来源），不依赖 OpenAI public-directory / curated Marketplace。
 不是单独复制 Skill：插件还包含 Remote MCP 与 OAuth 配置。Codex IDE extension 不支持这条插件安装流程。
-ZIP 免 Git 安装尚未验收，不在本流程中替换已安装来源。
+macOS 新安装优先使用下方 HTTPS 快照流程，无需 Git、Python、Node 或 Apple 开发工具；保留已有 Git 来源，不自动切换。
 
 ## 1. 确认环境，先读取已有状态
 
@@ -25,7 +25,9 @@ Windows 从当前桌面应用安装目录定位其捆绑 CLI，不假设与 macO
 ```
 
 只提取插件名称、来源、版本、enabled 状态、MCP URL 和错误；不要展示整份个人配置、headers 或凭据。
-最低历史兼容基线为 0.144.5；以当前桌面 CLI 的 `plugin --help` 和 `mcp --help` 确认命令支持。
+0.144.5 只是历史插件格式基线，不代表自动续期通过；以当前桌面 CLI 的 `plugin --help` 和 `mcp --help` 确认命令支持。
+
+首次登录前检查 Host 自动续期。2026-09-20 对桌面捆绑 0.155.0-alpha.9 的实测表明：未启用刷新协调时，多连接会重用已轮换的凭据；启用后多连接、刷新后超时重建通过。只读取 `features list` 中的 `mcp_oauth_refresh_coordination` 一行，不读取凭据。若该版本支持且为 false，由安装 Agent 使用官方 `features enable mcp_oauth_refresh_coordination` 开启并回读；它修改 Host 的全局刷新协调选项，需明确告知。已为 true 时不重复修改，也不要求重新登录。旧版本即使识别选项也不保证实现生效；版本和真实续期验收分别记录。未知版本/选项不可用时报告 Host 兼容性缺口，不能循环重连或擅自关闭 Auth0 轮换保护。
 
 - 已安装且启用、URL 为 `https://chatgrowing.com/mcp`：跳到连接验证，不先重新登录。
 - 已有来源但未安装：复用实际 marketplace 名称，进入安装步骤。
@@ -33,34 +35,35 @@ Windows 从当前桌面应用安装目录定位其捆绑 CLI，不假设与 macO
 - 同名 server 指向其他 URL、来源或身份冲突：报告冲突位置，确认归属后处理，不自动覆盖。
 - 已安装但 disabled：先确认这是用户意图还是未完成安装，按当前 CLI 帮助或插件 UI 启用，不重装碰运气。
 
-## 2. Git 可用性检查（仅当需要获取 marketplace 时）
+## 2. 新安装无需 Git / 开发工具
 
-已下载本仓库时，macOS/Linux 可运行独立的只读检查：
+先执行第 1 节的已有状态检查。已有 ChatGrowing 来源继续复用，不改变已有授权或强行切换分发来源。
+
+新安装：通过 HTTPS 下载并阅读本仓库 `scripts/install_without_git.sh`，保存到临时文件后执行；不要 `curl | bash`。使用系统已有 Bash/curl/tar 和已核验的 Codex CLI，无需安装 Git、Homebrew、Python 或 Xcode。
 
 ```bash
-/bin/bash scripts/preflight.sh --codex "$BUNDLED_CODEX"
+/bin/bash /absolute/path/install_without_git.sh --codex "$BUNDLED_CODEX"
 ```
 
-尚不能获取 Git 仓库时，先通过 GitHub 文件读取工具或 HTTPS 下载并阅读该脚本，再保存到临时目录执行；
-不要为获得诊断脚本先要求 Git，也不要使用 `curl | bash`。无需 Python、Node 或编译。
-脚本退出码：0 仅表示 CLI/Git 可用；10/11 为 CLI/Git 未找到；12/13 为已存在的 CLI/Git 执行失败；
-14 为 Apple Git 缺少可用 CLT；2 为参数错误。执行失败会返回候选路径、退出码和安全错误分类，不回显可能含凭据的原始输出。
-执行失败应先修复权限/运行库/环境，不能当成未安装；若后续候选可用，则正常继续。
-可用 `--git /absolute/path/to/git` 检查已发现的运行时 Git。
+该脚本从公开 GitHub API 解析 main 的精确 commit，下载该快照并安装为持久的本地 marketplace。它仅安装插件文件，之后仍须验证 ChatGrowing 登录及远程查询。它不会把“文件安装成功”称为业务可用。
 
-没有脚本也能按相同顺序检查：
+通过本脚本安装的来源，更新时仍运行同一脚本并加 `--update-owned-source`，再新建任务验证版本。已存在 Git 来源继续走原有 marketplace upgrade 和显式 plugin add；不得替换来源、删除凭据或让用户重新 Google 授权来解决安装问题。
 
-1. 读取 `command -v git`、`type -a git`；macOS 先执行 `xcode-select -p`。
-2. 若 macOS 未配置开发工具，不直接执行 `/usr/bin/git`，避免诊断时触发安装弹窗。
-3. 检查 PATH 中其他 Git、已存在的 Homebrew Git，以及 Host 已报告的运行时 Git，逐个验证 `--version`。
-   不假设每个版本 Codex 都捆绑 Git。Windows 用 `Get-Command git -All`，同时检查 Host 实际提供的运行时路径。
-4. 找到可用 Git 后，只对接下来的安装子进程临时把其目录放到 PATH 最前面；不要覆盖全局 PATH 或改 shell 启动文件。
-5. 确认检查范围内均无可用 Git，才向用户说明需要系统组件。macOS 可执行 `xcode-select --install`，
-   等系统安装完成后再检查 `git --version` 并继续。不能把“已发起安装”写成“依赖已就绪”。
+只做广告查询、查看频道/视频，不准备本地素材运行环境；本地文件助手未就绪不能阻塞远程验收，也不能据此要求用户安装系统组件。Host 支持按插件禁用单个 MCP 时，可在插件设置中停用 `chatgrowing_material_local`，保留远程 `chatgrowing_ads_read`。
 
-若同机以前装 Auxeo 成功，保留这次的 CLI 版本、Git 路径和失败命令；不要直接判断这台电脑从来没有 Git。
+### 用户需要本地文件上传时
 
-## 3. 添加来源并安装（仅执行尚未完成的步骤）
+由安装 Agent 自动准备一次 ChatGrowing 专用运行环境，不把 Python/Homebrew/Xcode 安装工作交给用户：
+
+- 新安装可给上述脚本加 `--with-materials`。
+- 已安装插件则运行实际安装目录中的 `scripts/setup_material_source_mcp.sh`，完成后重新连接本地助手。
+- 自动下载固定版本、校验 SHA-256、只安装带哈希的预编译 wheel；Python、FFmpeg 和 FFprobe 放在 ChatGrowing 专用用户目录，不改系统环境，不使用 sudo。
+- 当前自动准备范围是 macOS Apple Silicon 与 Intel。其他系统保持远程能力可用，不声称本地文件自动安装已支持。
+- 网络失败先按下载阶段处理并重试；失败保留旧运行环境，不回退到源码编译或要求安装开发工具。安装中断或文件缺失时重新运行同一准备脚本：替代环境完整验证后才切换，原不完整目录保留以供诊断，无需手动删除或重新登录。
+
+若坚持使用已有 Git 来源且 Git 不可用，先用 Host 报告的运行时 Git 或 `scripts/preflight.sh --git /verified/path` 检查。禁止为首次安装 ChatGrowing 默认执行 `xcode-select --install`；新安装直接走 HTTPS 快照流程。
+
+## 3. 已有 Git 来源的安装路径（HTTPS 快照安装成功后跳过）
 
 ```bash
 "$BUNDLED_CODEX" plugin marketplace add https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace.git --ref main
@@ -113,9 +116,11 @@ Windows 从当前桌面应用安装目录定位其捆绑 CLI，不假设与 macO
 
 | 失败阶段 | 下一步 |
 | --- | --- |
-| CLI / Git 缺失 | 环境检查，不重复 OAuth |
+| CLI 缺失 | 定位桌面内置 CLI，不重复 OAuth |
+| Git 缺失 | 新安装走 HTTPS 快照；已有来源先查 Host 提供的 Git，不默认安装开发工具 |
 | 下载 DNS / TLS / 超时 | 检查安装进程实际网络，不改 Auth0 |
 | 正式 MCP invalid_grant | 同一身份重新授权一次并验证，不借他人凭据 |
+| Token expired 反复出现 | 先核对 Host 刷新协调、offline_access 与认证方刷新结果；单独的过期文本不证明 refresh token 缺失，不重复 Google 授权 |
 | OAuth 成功、MCP 启动失败 | 读取正式启动错误、HTTP 状态和可用请求 ID |
 | HTTP 403，来源未明 | 先检查 Content-Type、脱敏错误码与来源标记；不能仅凭状态码判断成员权限 |
 | Cloudflare/代理拒绝（例如 1010、HTML challenge） | 保留 Ray/request ID、时间和路径，查对应边缘规则；不自动关防护或改 Auth0 |

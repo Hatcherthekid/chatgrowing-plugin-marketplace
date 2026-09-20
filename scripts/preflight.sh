@@ -126,16 +126,24 @@ if [ -z "$codex_path" ]; then
   printf '%s\n' 'status=cli_missing' 'next=locate_desktop_bundled_cli_then_rerun_with_--codex'
   exit 10
 fi
+# A version number alone does not prove rotating OAuth credentials are safe.
+# Inspect only the named public feature; never load credentials or print config.
+refresh_feature=$("$codex_path" features list 2>/dev/null | awk '$1 == "mcp_oauth_refresh_coordination" {print $NF; exit}')
+case "$refresh_feature" in
+  true) printf '%s\n' 'oauth_refresh_coordination=enabled' ;;
+  false) printf '%s\n' 'oauth_refresh_coordination=disabled' 'oauth_next=enable_supported_host_refresh_coordination_before_login' ;;
+  *) printf '%s\n' 'oauth_refresh_coordination=unverified' 'oauth_next=check_host_compatibility_not_repeated_login' ;;
+esac
 if [ -z "$git_path" ]; then
   if [ "$git_failed" -eq 1 ]; then
     printf '%s\n' 'status=git_execution_failed' 'next=diagnose_existing_git_environment'
     exit 13
   fi
   if [ "$apple_git_skipped" -eq 1 ]; then
-    printf '%s\n' 'status=apple_clt_unavailable' 'next=check_other_git_or_complete_command_line_tools_setup'
+    printf '%s\n' 'status=apple_clt_unavailable' 'next=use_reviewed_https_snapshot_installer'
     exit 14
   fi
-  printf '%s\n' 'status=git_missing' 'next=check_host_runtime_git_before_installing_system_tools'
+  printf '%s\n' 'status=git_missing' 'next=use_reviewed_https_snapshot_installer'
   exit 11
 fi
 printf '%s\n' 'status=ready' 'scope=cli_and_git_only_not_network_oauth_or_query'

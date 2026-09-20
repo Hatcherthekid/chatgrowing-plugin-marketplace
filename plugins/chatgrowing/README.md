@@ -16,9 +16,12 @@ The host opens the OAuth sign-in flow. This path does not require an OpenAI
 public-directory or curated Marketplace listing. Users do not copy an authorization URL
 or configure a localhost callback.
 
-Start a new Codex task after the Desktop app reports that authentication succeeded.
+After the Desktop reports successful authentication, use the current ChatGrowing tools.
+If the Host explicitly requires a tool refresh, follow that Host recovery action.
 
-This release requires Codex CLI/Desktop 0.144.5 or newer. Plugins are not
+Codex CLI/Desktop 0.144.5 is only the historical package-format baseline, not
+proof of OAuth refresh compatibility. Follow INSTALL.md for the tested Host
+version and refresh coordination checks; repeated login is not a refresh fix. Plugins are not
 supported in the Codex IDE extension. The unique `chatgrowing_ads_read` name avoids
 overwriting an existing local `ads_read` MCP server.
 

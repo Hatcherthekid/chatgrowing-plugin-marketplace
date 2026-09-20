@@ -43,21 +43,30 @@ def source_manifest(path, *, inspector=None):
 
 
 class MaterialSourceClient:
-    def __init__(self, client):
+    def __init__(self, client, *, api_prefix=''):
         # Credentials belong to the configured ChatGrowing origin only.
         origin=urlsplit(str(client.base_url))
         if (origin.username or origin.password or origin.query or origin.fragment or origin.path not in ('','/')
                 or not (origin.scheme=='https' or origin.scheme=='http' and origin.hostname in ('127.0.0.1','localhost','::1'))):
             raise MaterialError('material_service_origin_invalid',422)
         self.client=client
+        if api_prefix not in ('', '/control/agent-material'):
+            raise MaterialError('material_service_prefix_invalid', 422)
+        self.api_prefix=api_prefix
 
     async def _request(self, method, path, **kwargs):
         try:
-            response=await self.client.request(method,path,follow_redirects=False,**kwargs)
+            response=await self.client.request(method,self.api_prefix+path,follow_redirects=False,**kwargs)
         except httpx.HTTPError:
             # The next call reuses the distribution and queries media progress.
             raise MaterialError('material_transfer_result_unknown',502) from None
         if response.status_code!=200:
+            try:
+                reason=response.json().get('detail')
+            except (ValueError, AttributeError):
+                reason=None
+            if isinstance(reason,str) and re.fullmatch(r'(?:material|youtube)_[a-z0-9_]{1,100}',reason):
+                raise MaterialError(reason,response.status_code)
             raise MaterialError('material_transfer_rejected',response.status_code)
         try:return response.json()
         except ValueError:raise MaterialError('material_transfer_receipt_invalid',502) from None

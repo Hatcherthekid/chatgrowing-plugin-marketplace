@@ -11,6 +11,14 @@ description: 自由查询和分析当前授权广告数据，支持汇总、比�
 
 若当前 Host 能读取 ChatGrowing MCP Resources、但没有披露依赖的自定义 Tool，先读取 `ads-contract://host-tool-fallback-v1`，再按其中的 `ads-query://execute/{tool_name}{?arguments}` Resource Template 调用同一只读能力。该入口仅用于 Host 恢复，不扩大权限，也不得绕过正常 Tool。
 
+## 工具不可用时的处理
+
+先使用 Host 的工具发现能力查找本插件工具；安装了 Skill 不等于 MCP 已连接。只进行一次正式工具发现和一次适用的连接状态检查。正常业务查询不读取其他任务、聊天历史、钥匙串或 OAuth 凭据，不扫描用户配置，不通过网页搜索代替授权数据。
+
+只在 Host 已提供 ChatGrowing Resource Bridge 时使用它，并严格遵守该桥声明的只读能力；不得猜测资源 URI 或把只读桥当作素材写入入口。正式工具与桥均不可用时，简短报告失败阶段及已观察错误，保留原任务，不循环让用户重装、重登或新建任务。
+
+系统 curl 能访问服务、钥匙串存在记录，都不能证明当前 Host 已连接或身份有效。没有明确的 Host 权限拒绝证据，不归因于沙箱，也不建议开启“完全访问”。禁止提取 Host token 发直连请求、编写临时 Python/Node OAuth/PKCE 桥或另建素材登录。仅在正式客户端明确要求重新认证时，按现有单一 ChatGrowing 登录流程恢复。
+
 ## 工作方式
 
 遵循 `Dictionary-first -> Query-plan-first -> SQL/Python execution -> LLM interpretation`：
