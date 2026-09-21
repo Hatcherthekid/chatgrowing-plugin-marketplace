@@ -21,7 +21,7 @@ Windows 从当前桌面应用安装目录定位其捆绑 CLI，不假设与 macO
 "$BUNDLED_CODEX" --version
 "$BUNDLED_CODEX" plugin marketplace list --json
 "$BUNDLED_CODEX" plugin list --json
-"$BUNDLED_CODEX" mcp get chatgrowing_ads_read --json
+/bin/bash /absolute/path/scripts/diagnose.sh --codex "$BUNDLED_CODEX"
 ```
 
 只提取插件名称、来源、版本、enabled 状态、MCP URL 和错误；不要展示整份个人配置、headers 或凭据。
@@ -37,7 +37,7 @@ Windows 从当前桌面应用安装目录定位其捆绑 CLI，不假设与 macO
 
 ## 2. 新安装无需 Git / 开发工具
 
-先执行第 1 节的已有状态检查。已有 ChatGrowing 来源继续复用，不改变已有授权或强行切换分发来源。
+先执行第 1 节的已有状态检查。正常 ChatGrowing 来源继续复用。只有已核验的历史异常 local 来源按第 3 节恢复登记，不改变 OAuth 授权。
 
 新安装：通过 HTTPS 下载并阅读本仓库 `scripts/install_without_git.sh`，保存到临时文件后执行；不要 `curl | bash`。使用系统已有 Bash/curl/tar 和已核验的 Codex CLI，无需安装 Git、Homebrew、Python 或 Xcode。
 
@@ -47,7 +47,7 @@ Windows 从当前桌面应用安装目录定位其捆绑 CLI，不假设与 macO
 
 该脚本从公开 GitHub API 解析 main 的精确 commit，下载该快照并安装为持久的本地 marketplace。它仅安装插件文件，之后仍须验证 ChatGrowing 登录及远程查询。它不会把“文件安装成功”称为业务可用。
 
-通过本脚本安装的来源，更新时仍运行同一脚本并加 `--update-owned-source`，再新建任务验证版本。已存在 Git 来源继续走原有 marketplace upgrade 和显式 plugin add；不得替换来源、删除凭据或让用户重新 Google 授权来解决安装问题。
+通过本脚本安装的来源，更新时仍运行同一脚本并加 `--update-owned-source`，再完成第 5 节的目标设备接入验收。登记失败后可以重复同一命令；只接管具有安装器标记且身份校验通过的残留目录。已存在 Git 来源继续走原有 marketplace upgrade 和显式 plugin add；不得替换来源、删除凭据或让用户重新 Google 授权来解决安装问题。
 
 只做广告查询、查看频道/视频，不准备本地素材运行环境；本地文件助手未就绪不能阻塞远程验收，也不能据此要求用户安装系统组件。Host 支持按插件禁用单个 MCP 时，可在插件设置中停用 `chatgrowing_material_local`，保留远程 `chatgrowing_ads_read`。
 
@@ -55,7 +55,7 @@ Windows 从当前桌面应用安装目录定位其捆绑 CLI，不假设与 macO
 
 由安装 Agent 自动准备一次 ChatGrowing 专用运行环境，不把 Python/Homebrew/Xcode 安装工作交给用户：
 
-- 新安装可给上述脚本加 `--with-materials`。
+- 新安装可给上述脚本加 `--with-materials`；先完成插件安装并回读，再准备素材环境。素材失败返回 20，已安装插件保留，只重试素材准备，不重复更新或登录。
 - 已安装插件则运行实际安装目录中的 `scripts/setup_material_source_mcp.sh`，完成后重新连接本地助手。
 - 自动下载固定版本、校验 SHA-256、只安装带哈希的预编译 wheel；Python、FFmpeg 和 FFprobe 放在 ChatGrowing 专用用户目录，不改系统环境，不使用 sudo。
 - 当前自动准备范围是 macOS Apple Silicon 与 Intel。其他系统保持远程能力可用，不声称本地文件自动安装已支持。
@@ -93,13 +93,24 @@ Canonical 仓库为 `https://github.com/Hatcherthekid/chatgrowing-plugin-marketp
 /bin/bash /absolute/path/install_without_git.sh --codex "$BUNDLED_CODEX" --migrate-local-source "$VERIFIED_LOCAL_SOURCE"
 ```
 
-这会校验来源仅包含 ChatGrowing 分发、插件名称及官方 MCP 地址，再在原路径换入 HTTPS 快照，执行官方 `plugin add`。市场名称、路径和插件身份保持不变；原分发目录保留。拒绝 Git checkout、Host 缓存、链接或不明内容，不删除重建市场，不手改已安装缓存，也不改授权。后续更新可用 `--update-owned-source`。下载或校验失败保留旧来源；安装步骤失败则回滚来源目录，但必须重新回读实际安装版本，不能宣称 CLI 的部分写入也被完全回滚。
+安装器区分两种已核验的旧 local 来源：
+
+- 独立分发目录：在原路径换入快照，保留旧目录；拒绝 Git checkout、链接和未知内容。
+- `.tmp/marketplaces` 中的旧 local 来源：不覆盖缓存。先在 `${CODEX_HOME:-$HOME/.codex}/chatgrowing/marketplace-http` 准备并核验新快照，然后用官方 `marketplace remove` / `marketplace add` 重登记同名市场，再 `plugin add`。这是明确迁移请求中的一次性恢复，正常 Git 来源不走此分支。移除登记期间插件会暂时不可用。原目录与原来源记录保留；登记失败尝试恢复原来源并回读实际安装状态，不能保证 OAuth 连续性已经验收。
+
+缓存来源重登记前核对原市场版本与实际安装版本；不一致时返回 10 并保留安装，不执行移除登记。当前官方 CLI 无历史版本安装参数，无法保证精确恢复，因此此状态需要先准备与原安装版本一致、经核验的恢复来源；不能靠重复运行或手改缓存绕过。失败恢复时再次核对来源版本，发生变化则跳过自动重装并报告实际状态。
+
+普通失败恢复后，重复同一安装命令继续；不要手改 Host 缓存。目录切换中断由来源路径回执先恢复，再读取 CLI 状态。重登记中断且当前市场缺失时，同一迁移命令仅在原路径与 `previous-marketplace-source.txt`、`pending-marketplace-rebind.plist` 的来源一致，且持久回执中的原安装版本与当前恢复来源版本相同后恢复登记，并回读恢复版本。缺失版本回执或来源版本变化时，在登记/安装前停止，不把当前来源版本当成原安装版本。回执损坏、来源不匹配或未知内容保持不动并报告。
+
+安装器使用系统 lockf 的内核锁，进程退出自动释放；锁文件保留不代表仍在安装。兼容旧目录锁时仅自动回收已确认进程不存在的 PID 锁。无 PID 的旧锁无论存在多久都保留并返回 75；须确认所有旧安装器已退出后，才可移除空旧锁目录。不能用锁年龄判断旧安装器已退出。
+
+来源文件恢复不等于插件恢复。失败输出应包含实际 installed version / enabled 或明确 unverified；后续使用同一命令继续到目标版本，并完成第 5 节。若需退回旧版，应另行核验保留分发的版本，通过官方 CLI 安装，再回读；不得直接替换版本化缓存。
 
 ### 下载失败与连接失败分别处理
 
 HTTPS 快照不使用 raw.githubusercontent.com，但仍需要访问 GitHub API 和 codeload。普通 GitHub 页面可访问不证明这些下载域名可访问。TLS 证书失败不得通过 `curl -k` 或关闭验证绕过；没有验证可用的下载来源时，保留旧版并明确下载未完成，不重复登录或宣称升级成功。
 
-升级结束核对实际 installed version、enabled 和同一 MCP URL。旧任务未刷新工具时，只重载相关工具或新建任务验证，不能把它称为需要再次登录。素材助手准备是独立步骤，远程查询不依赖本地 Python。更新成功也不证明另一设备的 MCP 传输故障已修复。
+升级结束核对实际 installed version、enabled 和同一 MCP URL。如果升级时桌面 Host 仍在运行，完整退出并重新打开桌面应用一次，再新建任务；不注销账号。Codex 0.148.0-alpha.9 已复现外部 CLI 升级后 Host 保留已删除的旧缓存路径，只新建任务或重载 MCP 配置仍可报 os error 2。Host 重启解决的是缓存路径刷新，不代表远程连接或业务查询通过。素材助手准备是独立步骤，远程查询不依赖本地 Python。更新成功也不证明另一设备的 MCP 传输故障已修复。
 
 ## 4. 验证连接，再按需授权
 
@@ -118,20 +129,29 @@ HTTPS 快照不使用 raw.githubusercontent.com，但仍需要访问 GitHub API 
 若内置浏览器确实无法完成，在同一电脑的系统 Chrome 打开仍有效的初始授权链接；链接失效才结束旧进程、发起新流程。
 不复制中途 consent URL，不展示含 OAuth code/state 的链接，不把凭据写进文件。
 
-## 5. 从连接到真实查询
+## 5. 目标设备工具发现与真实查询
 
-按照安装的 ads-read-analysis Skill：Capability Context → Catalog Search → Describe → 必要 Health → 最小 Data Query。
-从服务端选择当前成员明确授权的一个 resource_ref、实际支持的日期和指标；不硬编码其他用户账户。
-返回真实 source-backed 结果及 trace_id，区分真实零、无数据、无权限与失败。
+每次安装/更新的验收绑定**实际受影响设备和目标任务**。开发者机器、管理员身份、另一任务或另一设备通过不能代签。
 
-若授权完成但当前任务仍无正式工具：
+1. `plugin list` 的 installed version 与 enabled 是安装事实；市场版本和磁盘上新 Skill 的存在不能替代它。
+2. 对比目标任务的 Skill 清单路径。仍引用不存在的旧版本时，标记 `task_skill_reference=stale_or_other_source`；读取新版 Skill 不会自动加载 MCP。外部 CLI 升级后应完整退出并重新打开桌面 Host 一次，再新建任务；0.148.0-alpha.9 中仅新建任务或 config/mcpServer/reload 不能保证清除旧缓存。重启后仍引用旧路径则保留 Host 发现状态未同步的证据，不循环重装。
+3. 检查目标任务的原生 MCP 状态，而不是无归属的空 Resources 列表。桌面 CLI 支持现有 daemon proxy 时，可执行下面的只读诊断；它不启动第二个 Host、不登录、不刷新凭据、不调用业务工具：
 
-1. 记录正式 MCP 启动时间与原始错误，不把手动脚本沙箱的 ENOTFOUND 当成正式客户端错误。
-2. 有明确启动/认证错误就处理该阶段；若是旧任务未刷新能力，使用 Host 提供的刷新能力，或让用户新建一次任务继续。
-   未获新建任务授权时不自动创建；交接只包含步骤状态和安全错误，不包含凭据。
-3. 若服务端 tools/list 正常而 Host 不披露工具，可使用已发现的正式 Resource Bridge 做兼容验证。
-   Bridge 查询通过单独标为“兼容查询通过，正式工具待验证”，不得报完整安装验收通过。
-4. 一次新任务仍失败，立即查正式启动日志并报告可定位错误；不循环要求新建任务、重装或重新登录。
+```bash
+/bin/bash /absolute/path/scripts/diagnose.sh --codex "$BUNDLED_CODEX" \
+  --task-skill-path "$ACTUAL_TASK_SKILL_PATH" --thread-id "$AFFECTED_THREAD_ID"
+```
+
+`AFFECTED_THREAD_ID` 必须来自该设备实际任务，不编造。无 daemon、CLI 不支持或状态不可读时，诊断返回 unknown，开发侧检查同一任务的正式启动日志。也可以用 `--host-status /path/to/native-response.json` 对实际 `mcpServerStatus/list` 的 result 脱敏分类；这是外部提供的观测，不是独立验证。
+
+0.148.0-alpha.9 的原生状态响应不包含 `runtimeStatus` / `toolsError`，诊断应标记字段未提供；可用 authStatus、工具列表和该任务启动事件分别判断，不因缺少新字段认定连接失败。诊断同时只读检查本地运行时文件；缺失运行时通常导致脚本明确提示准备后关闭握手，不能据此解释进程启动时的 `os error 2`。
+
+4. 按 `host_connection` 分流：notStarted/disabled 查该任务插件加载；starting 等待本次启动；authenticationRequired 才核实认证；failed 查正式传输/发现错误；connected 但工具缺失查 `toolsError` 和 Host catalog。Host catalog 中有工具仍不代表当前任务能够调用，必须实际调用。
+5. 正式调用 `ads_capability_context` 和当前频道发现工具，按服务端返回的授权范围列出用户请求的频道和账户。需要最小广告数据查询时再使用 Catalog Search → Describe → 必要 Health → Data Query。不通过名称猜账户，不跨资源查数。
+
+Resource Bridge 仅在本任务已发现 ChatGrowing 的正式合同和模板时可用；没有服务器归属、连接和成功请求证据的空列表，不证明服务端返回空，也不证明无权限。Bridge 成功单独标为兼容查询通过，不能替代正式工具验收。
+
+目标任务仍失败时保留唯一故障记录：匿名设备标签、任务创建于升级前/后、CLI/插件版本、Skill 路径是否匹配、ChatGrowing runtimeStatus/authStatus、工具是否存在、脱敏错误类别及可用请求时间/request ID。原始 headers/token/code、完整个人配置和业务明细不进入诊断回执。没有业务调用就写“未发起，权限未知”；不能把安装成功标成接入成功。
 
 ## 6. 完成回执与恢复分流
 
