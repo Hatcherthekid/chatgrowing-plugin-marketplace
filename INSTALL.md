@@ -39,7 +39,7 @@ Windows 从当前桌面应用安装目录定位其捆绑 CLI，不假设与 macO
 该命令只通过官方 CLI 检查、开启并回读 Host 的全局刷新协调选项，不读取或清除 OAuth 凭据。执行前向用户说明这一配置改动；用户已要求安装或修复本问题时，不再重复索取同范围许可。已为 true 时不重复写入。
 
 - 返回 `host_upgrade_required`（21）：当前桌面 Host 不提供该能力，先更新桌面应用，再执行同一命令。只更新 PATH 中 npm/Homebrew CLI 无效；不要重登或重装插件碰运气。脚本不替换厂商二进制，也不声称已修好旧 Host。
-- `--check-running` 返回 `running_host_activation=restart_required`（26）：至少一个正在运行的桌面 app-server 早于配置写入。保存工作后完全退出并重开桌面应用，再运行同一检查；不要在旧进程里重新授权。返回 `restart_observed_feature_not_proven`（0）只证明发现的进程晚于配置写入，仍须真实查询和自然续期验收；无法识别进程或配置时返回 25，不可当成通过。
+- `--check-running` 返回 `running_host_activation=restart_required`（26）：至少一个正在运行的桌面 app-server 比配置写入早超过 60 秒。保存工作后完全退出并重开桌面应用，再运行同一检查；不要在旧进程里重新授权。应用启动后一分钟内改写配置会返回 `unverified`（25），这是时间证据不足，不表示要再次重启。返回 `restart_observed_feature_not_proven`（0）只证明发现的进程晚于配置写入；真实查询和自然续期仍须验收。
 - `--apply` 返回 `host_configuration_enabled`（0）仅表示配置回读成功。脚本不强杀活跃任务；配置刚开启时先重开桌面应用，再检查运行进程。
 - 配置启用不能救回已被 Auth0 废止的凭证族。Host 修复生效后，只有仍收到明确 `invalid_grant` 的连接才重新进行一次 ChatGrowing 授权；有效连接不重登，不重新授权 YouTube。
 - 同一组凭证出现 `ferrt`（旧代重用）后，持续 `fertft` 或 `invalid_grant` 不能靠重试恢复；先完成 Host 生效检查，再做一次重新授权。记录脱敏的首次 `ferrt` 时间与 counter，后续相同错误不要逐条当成独立故障。

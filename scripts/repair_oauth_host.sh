@@ -88,12 +88,21 @@ if [ "$check_running" = true ]; then
   running=0
   old=0
   unverified=0
+  startup_race=0
   while read -r pid executable; do
     [ "$executable" = "$codex" ] || continue
     running=$((running + 1))
     started=$(ps -p "$pid" -o lstart= 2>/dev/null) || { unverified=$((unverified + 1)); continue; }
     started_epoch=$(date -j -f '%a %b %e %T %Y' "$started" +%s 2>/dev/null) || { unverified=$((unverified + 1)); continue; }
-    if [ "$started_epoch" -lt "$config_epoch" ]; then old=$((old + 1)); fi
+    if [ "$started_epoch" -lt "$config_epoch" ]; then
+      if [ $((config_epoch - started_epoch)) -le 60 ]; then
+        # Desktop startup may rewrite config.toml immediately after spawning.
+        # Its mtime then cannot establish which feature snapshot was loaded.
+        startup_race=$((startup_race + 1))
+      else
+        old=$((old + 1))
+      fi
+    fi
   done < <(ps -axo pid=,comm= 2>/dev/null)
   printf 'running_host_processes=%s\n' "$running"
   if [ "$old" -gt 0 ]; then
@@ -103,6 +112,11 @@ if [ "$check_running" = true ]; then
   fi
   if [ "$running" -eq 0 ] || [ "$unverified" -gt 0 ]; then
     printf '%s\n' 'running_host_activation=unverified' 'reason=no_verified_desktop_process'
+    exit 25
+  fi
+  if [ "$startup_race" -gt 0 ]; then
+    printf '%s\n' 'running_host_activation=unverified' 'reason=config_rewritten_during_desktop_startup' \
+      'next=verify_real_query_and_natural_refresh'
     exit 25
   fi
   printf '%s\n' 'running_host_activation=restart_observed_feature_not_proven' \
