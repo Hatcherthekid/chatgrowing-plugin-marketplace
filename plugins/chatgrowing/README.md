@@ -3,7 +3,7 @@
 ChatGrowing connects Codex to one governed Remote Agent Gateway for authorized Meta,
 Google Ads, TikTok Ads, and AppsFlyer reading, analysis, monitoring, and reporting. The
 same ChatGrowing login can expose permitted material and YouTube actions; those actions
-remain protected by server-side capabilities, resource bindings, explicit confirmation,
+remain protected by server-side capabilities, resource bindings, explicit user intent,
 idempotency, and audit.
 
 ## Install
@@ -35,4 +35,5 @@ The Git distribution repository may be public, but data is not. Reading ChatGrow
 sign-in, active organization membership, and an assigned resource scope. This
 package contains the reviewed local file helper required by reference-only material
 workflows. It contains no server source, advertising credentials, tokens, or customer data.
-YouTube writes remain behind server authorization and explicit human confirmation.
+YouTube writes require an authenticated, permission-checked submission of a fixed
+publication manifest matching the user's explicit request.
