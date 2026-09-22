@@ -139,7 +139,10 @@ for ((i=0;i<n;i++)); do
   error="$(value "$status_file" "data.$i.toolsError" || true)"
   case "$error" in
     ''|null) printf '%s\n' 'tools_error=not_reported' ;;
-    *invalid_grant*|*needs_reauth*) printf '%s\n' 'tools_error=explicit_reauthentication_error' ;;
+    *invalid_grant*|*needs_reauth*)
+      printf '%s\n' 'tools_error=explicit_reauthentication_error' \
+        'oauth_next=verify_running_host_activation_then_reauthorize_once' \
+        'repeating_refresh_will_not_restore_revoked_token_family' ;;
     *metadata*|*discovery*) printf '%s\n' 'tools_error=discovery_failure' ;;
     *request.send*|*connect*|*TLS*|*DNS*) printf '%s\n' 'tools_error=transport_failure' ;;
     *) printf '%s\n' 'tools_error=present_unclassified' ;;

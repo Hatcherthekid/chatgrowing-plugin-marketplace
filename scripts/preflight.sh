@@ -130,9 +130,9 @@ fi
 # Inspect only the named public feature; never load credentials or print config.
 refresh_feature=$("$codex_path" features list 2>/dev/null | awk '$1 == "mcp_oauth_refresh_coordination" {print $NF; exit}')
 case "$refresh_feature" in
-  true) printf '%s\n' 'oauth_refresh_coordination=enabled' ;;
-  false) printf '%s\n' 'oauth_refresh_coordination=disabled' 'oauth_next=enable_supported_host_refresh_coordination_before_login' ;;
-  *) printf '%s\n' 'oauth_refresh_coordination=unverified' 'oauth_next=check_host_compatibility_not_repeated_login' ;;
+  true) printf '%s\n' 'oauth_refresh_coordination=enabled' 'oauth_runtime_activation=not_verified' ;;
+  false) printf '%s\n' 'oauth_refresh_coordination=disabled' 'oauth_readiness=blocked' 'oauth_next=enable_supported_host_refresh_coordination_before_login' ;;
+  *) printf '%s\n' 'oauth_refresh_coordination=unverified' 'oauth_readiness=unverified' 'oauth_next=check_host_compatibility_not_repeated_login' ;;
 esac
 if [ -z "$git_path" ]; then
   if [ "$git_failed" -eq 1 ]; then
@@ -146,4 +146,4 @@ if [ -z "$git_path" ]; then
   printf '%s\n' 'status=git_missing' 'next=use_reviewed_https_snapshot_installer'
   exit 11
 fi
-printf '%s\n' 'status=ready' 'scope=cli_and_git_only_not_network_oauth_or_query'
+printf '%s\n' 'status=cli_and_git_ready' 'scope=cli_and_git_only_not_network_oauth_or_query'

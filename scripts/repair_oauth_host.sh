@@ -5,6 +5,7 @@ set -eu
 codex=''
 apply=false
 mode=''
+check_running=false
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --codex)
@@ -15,7 +16,9 @@ while [ "$#" -gt 0 ]; do
       mode="$1"
       [ "$mode" != --apply ] || apply=true
       shift ;;
-    *) printf '%s\n' 'usage: repair_oauth_host.sh --codex /verified/desktop/codex [--check | --apply]' >&2; exit 2 ;;
+    --check-running)
+      check_running=true; shift ;;
+    *) printf '%s\n' 'usage: repair_oauth_host.sh --codex /verified/desktop/codex [--check | --apply] [--check-running]' >&2; exit 2 ;;
   esac
 done
 case "$codex" in /*) ;; *) exit 2 ;; esac
@@ -68,6 +71,42 @@ if [ "$feature" = false ]; then
   printf '%s\n' 'configuration_changed=true' 'next=restart_the_desktop_app_after_saving_active_work'
 else
   printf '%s\n' 'configuration_changed=false' 'next=verify_the_running_host_uses_the_enabled_feature'
+fi
+if [ "$check_running" = true ]; then
+  # This is a conservative activation check, not a credential or feature-state
+  # inspection inside the desktop process. A process older than the config write
+  # cannot have loaded that write. A newer process still needs real OAuth tests.
+  config_file="${CODEX_HOME:-$HOME/.codex}/config.toml"
+  if [ "$(uname -s)" != Darwin ] || [ ! -f "$config_file" ] || ! command -v ps >/dev/null 2>&1; then
+    printf '%s\n' 'running_host_activation=unverified' 'reason=process_or_config_unavailable'
+    exit 25
+  fi
+  if ! config_epoch=$(stat -f %m "$config_file" 2>/dev/null); then
+    printf '%s\n' 'running_host_activation=unverified' 'reason=config_timestamp_unavailable'
+    exit 25
+  fi
+  running=0
+  old=0
+  unverified=0
+  while read -r pid executable; do
+    [ "$executable" = "$codex" ] || continue
+    running=$((running + 1))
+    started=$(ps -p "$pid" -o lstart= 2>/dev/null) || { unverified=$((unverified + 1)); continue; }
+    started_epoch=$(date -j -f '%a %b %e %T %Y' "$started" +%s 2>/dev/null) || { unverified=$((unverified + 1)); continue; }
+    if [ "$started_epoch" -lt "$config_epoch" ]; then old=$((old + 1)); fi
+  done < <(ps -axo pid=,comm= 2>/dev/null)
+  printf 'running_host_processes=%s\n' "$running"
+  if [ "$old" -gt 0 ]; then
+    printf '%s\n' 'running_host_activation=restart_required' \
+      'next=save_work_then_fully_quit_and_reopen_desktop'
+    exit 26
+  fi
+  if [ "$running" -eq 0 ] || [ "$unverified" -gt 0 ]; then
+    printf '%s\n' 'running_host_activation=unverified' 'reason=no_verified_desktop_process'
+    exit 25
+  fi
+  printf '%s\n' 'running_host_activation=restart_observed_feature_not_proven' \
+    'next=verify_real_query_and_natural_refresh'
 fi
 printf '%s\n' 'status=host_configuration_enabled' \
   'revoked_refresh_credentials=not_restored' \

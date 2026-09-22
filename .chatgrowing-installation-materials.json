@@ -6,12 +6,12 @@
   "plugin_tree_sha256": "dd1c0ef99a337545fd80fd7b76bcbdeaa28c93908887550185ee1d2970df5a5e",
   "previous_marketplace_metadata_sha256": "b8bbfcb4a080e08951474ee25809f3e597c8e68824c4fd8e9be142a1468a873d",
   "files": {
-    "INSTALL.md": "4233581fe3c9af9409c288e9ec197df5ad61ab475ebb55524d355faaca49f920",
+    "INSTALL.md": "cde2a72436fad96439fb20f9cd7303d2a0bb3ff730e0612db262150f33596d1f",
     "README.md": "1e2554ec526ea714c7917231827f1f925a52cdc91d9eedc8fc6a00dd50a9e497",
-    "scripts/diagnose.sh": "cf0fe237c07889c9398bde70d956200afab5079e1ce8874f7885cd1166215910",
+    "scripts/diagnose.sh": "906cfb0495a2beb4235882a5bbc2d32c328894559a510c38ed64d6b4ae0f329a",
     "scripts/install_without_git.sh": "4440e8e7fca095fcee6de0afa5814768532e7e5b310bb0fc131541651cee0650",
-    "scripts/preflight.sh": "b30cf7b66d51c4496238e0eabb6332aa27dcfbd146f909ef8a53ffe57e3e5d06",
-    "scripts/repair_oauth_host.sh": "71c2bc1ed15435d3dd1cca592914f96138b450b0402edcd168f8513b0337e068"
+    "scripts/preflight.sh": "a8b35c11f914d633f3a78bdeec0b924dd67b27ccddc5a31874b4756230eb64b8",
+    "scripts/repair_oauth_host.sh": "7ac352cb1fe60259cad9b545c23d2d65bed289a9d11203bb2f3162cf90563733"
   },
   "runtime_release_changed": false,
   "preserved_publication_status": "owner_authorized_with_known_limitation",
