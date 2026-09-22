@@ -27,7 +27,22 @@ Windows 从当前桌面应用安装目录定位其捆绑 CLI，不假设与 macO
 只提取插件名称、来源、版本、enabled 状态、MCP URL 和错误；不要展示整份个人配置、headers 或凭据。
 0.144.5 只是历史插件格式基线，不代表自动续期通过；以当前桌面 CLI 的 `plugin --help` 和 `mcp --help` 确认命令支持。
 
-首次登录前检查 Host 自动续期。2026-09-20 对桌面捆绑 0.155.0-alpha.9 的实测表明：未启用刷新协调时，多连接会重用已轮换的凭据；启用后多连接、刷新后超时重建通过。只读取 `features list` 中的 `mcp_oauth_refresh_coordination` 一行，不读取凭据。若该版本支持且为 false，由安装 Agent 使用官方 `features enable mcp_oauth_refresh_coordination` 开启并回读；它修改 Host 的全局刷新协调选项，需明确告知。已为 true 时不重复修改，也不要求重新登录。旧版本即使识别选项也不保证实现生效；版本和真实续期验收分别记录。未知版本/选项不可用时报告 Host 兼容性缺口，不能循环重连或擅自关闭 Auth0 轮换保护。
+首次登录或处理反复掉授权时，先修复 Host 自动续期。2026-09-22 对真实二进制的隔离实测确认：0.148.0-alpha.9 在同一 app-server、两个任务连接中收到 HTTP 401 后，会重用其他连接已轮换并保存的旧凭据；0.155.0-alpha.9 默认路径也有此问题，启用 `mcp_oauth_refresh_coordination` 后同一场景通过。因此单看版本或重新登录不算修复。
+
+下载并阅读本仓库 `scripts/repair_oauth_host.sh`，由安装 Agent 使用已核验的桌面捆绑 CLI 执行：
+
+```bash
+/bin/bash /absolute/path/repair_oauth_host.sh --codex "$BUNDLED_CODEX" --apply
+```
+
+该命令只通过官方 CLI 检查、开启并回读 Host 的全局刷新协调选项，不读取或清除 OAuth 凭据。执行前向用户说明这一配置改动；用户已要求安装或修复本问题时，不再重复索取同范围许可。已为 true 时不重复写入。
+
+- 返回 `host_upgrade_required`（21）：当前桌面 Host 不提供该能力，先更新桌面应用，再执行同一命令。只更新 PATH 中 npm/Homebrew CLI 无效；不要重登或重装插件碰运气。脚本不替换厂商二进制，也不声称已修好旧 Host。
+- 返回 `host_configuration_enabled`（0）：仅表示配置回读成功。若本次改了选项，保存工作后完全退出并重开桌面应用，使新 app-server 使用新配置；脚本不强杀活跃任务。已经启用时先核对当前进程是否已加载，避免反复重启。
+- 配置启用不能救回已被 Auth0 废止的凭证族。Host 修复生效后，只有仍收到明确 `invalid_grant` 的连接才重新进行一次 ChatGrowing 授权；有效连接不重登，不重新授权 YouTube。
+- 故障电脑的验收仍需实际查询及自动续期。另一个设备、合成测试或配置回读不能代签。其他版本即使存在开关，也不自动继承 0.155.0-alpha.9 的实现验证；不得关闭 Auth0 轮换保护。
+
+只做只读检查时用 `--check`（默认）；20 表示选项关闭，22 表示检查失败，23/24 表示开启或回读失败。失败后保留现场，不继续登录流程。
 
 - 已安装且启用、URL 为 `https://chatgrowing.com/mcp`：普通使用跳到连接验证，不先重新登录；用户明确要求更新或版本落后时，先完成下方来源感知更新，再核对实际安装版本。
 - 已有来源但未安装：复用实际 marketplace 名称，进入安装步骤。

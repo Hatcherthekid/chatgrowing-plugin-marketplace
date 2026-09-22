@@ -1,16 +1,17 @@
 {
   "schema_version": "chatgrowing.installation-materials-update.v1",
   "status": "staged_not_published",
-  "plugin_version": "0.4.6",
-  "artifact_sha256": "07e2bf6abc7a78d652fadc3ecf67d89477a59dad5900be2ad2b29cb26955cb64",
-  "plugin_tree_sha256": "e5793edc906a2ebfac574c5ae9d93ff2efea2a13f60ea5cc61fdcacf36c30898",
-  "previous_marketplace_metadata_sha256": "1473ceea417791fdcc9caa0549b6fce166fb83d6968d44d3ce4bc1017bb3679b",
+  "plugin_version": "0.4.7",
+  "artifact_sha256": "fe6aa79109eda93d5d43514f300dd0d71d82cf0e01afe36a2b0e150fec3af308",
+  "plugin_tree_sha256": "dd1c0ef99a337545fd80fd7b76bcbdeaa28c93908887550185ee1d2970df5a5e",
+  "previous_marketplace_metadata_sha256": "b8bbfcb4a080e08951474ee25809f3e597c8e68824c4fd8e9be142a1468a873d",
   "files": {
-    "INSTALL.md": "9f434d1a7557e24e27f5123da4a6908444dc302f264b01d6a46ecadd95e098b9",
+    "INSTALL.md": "4233581fe3c9af9409c288e9ec197df5ad61ab475ebb55524d355faaca49f920",
     "README.md": "1e2554ec526ea714c7917231827f1f925a52cdc91d9eedc8fc6a00dd50a9e497",
     "scripts/diagnose.sh": "cf0fe237c07889c9398bde70d956200afab5079e1ce8874f7885cd1166215910",
     "scripts/install_without_git.sh": "4440e8e7fca095fcee6de0afa5814768532e7e5b310bb0fc131541651cee0650",
-    "scripts/preflight.sh": "b30cf7b66d51c4496238e0eabb6332aa27dcfbd146f909ef8a53ffe57e3e5d06"
+    "scripts/preflight.sh": "b30cf7b66d51c4496238e0eabb6332aa27dcfbd146f909ef8a53ffe57e3e5d06",
+    "scripts/repair_oauth_host.sh": "71c2bc1ed15435d3dd1cca592914f96138b450b0402edcd168f8513b0337e068"
   },
   "runtime_release_changed": false,
   "preserved_publication_status": "owner_authorized_with_known_limitation",
