@@ -57,10 +57,10 @@ if [[ "$version" =~ ^[0-9][0-9A-Za-z.+_-]{0,63}$ ]]; then
     for component in scripts/run_material_source_mcp.sh scripts/material_runtime_common.sh scripts/setup_material_source_mcp.sh runtime/material-source/code/apps/material_source_mcp_server.py; do
       if [[ ! -f "$root/$component" ]]; then printf 'local_packaged_file_missing=%s\n' "$component"; fi
     done
-    if [[ -f "$root/runtime-config/requirements.lock" && -f "$root/runtime-config/downloads.tsv" && -f "$root/scripts/setup_material_source_mcp.sh" ]]; then
-      revision="$(cat "$root/runtime-config/requirements.lock" "$root/runtime-config/downloads.tsv" "$root/scripts/setup_material_source_mcp.sh" | shasum -a 256 | awk '{print $1}')"
+    if [[ -f "$root/runtime-config/bundles.tsv" && -f "$root/scripts/setup_material_source_mcp.sh" ]]; then
+      revision="$(cat "$root/runtime-config/bundles.tsv" "$root/scripts/setup_material_source_mcp.sh" | shasum -a 256 | awk '{print $1}')"
       runtime="${CODEX_HOME:-${HOME}/.codex}/chatgrowing/runtimes/$(uname -s)-$(uname -m)-$revision"
-      if [[ -f "$runtime/.ready" && "$(cat "$runtime/.ready")" == "$revision" && -x "$runtime/venv/bin/python" && -x "$runtime/bin/ffmpeg" && -x "$runtime/bin/ffprobe" ]]; then
+      if [[ -f "$runtime/.ready" && "$(cat "$runtime/.ready")" == "$revision" && -x "$runtime/bin/python3.11" ]]; then
         printf '%s\n' 'local_runtime_files=ready_not_execution_verified'
       else
         printf '%s\n' 'local_runtime_files=missing_or_incomplete' 'local_runtime_missing_does_not_explain_spawn_enoent' 'remote_queries_do_not_require_local_runtime'
