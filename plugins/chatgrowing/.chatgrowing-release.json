@@ -14,14 +14,14 @@
   "source_exposure": "reviewed_plugin_and_local_helper_bundle_only",
   "server_authorization_required": true,
   "compatibility_policy": "current_and_previous_stable_plugin",
-  "plugin_version": "0.4.9",
+  "plugin_version": "0.4.10",
   "bootstrap_contract_version": "ChatGrowingBootstrapContract.v1",
-  "source_git_commit": "57d657a54a9c07f072a8d67fb75da85b498b5b8b",
-  "built_at_utc": "2026-09-23T05:57:13.109830Z",
-  "artifact_sha256": "13eea7b94cace6eec86001ea21b7995dba63bd85bb3b5aa8abfc1ba1dc68ad90",
+  "source_git_commit": "ab07fb9368d1620ec019ecef068f1f4b51a95b38",
+  "built_at_utc": "2026-09-23T14:42:39.574545Z",
+  "artifact_sha256": "49b112179847d1efed7028ebcce9542bfa7b51d854b9c95ae36ba92f3d14d853",
   "tool_schema_version": "AdsCapabilityMcpPublicSchema.v3",
   "tool_schema_fingerprint": "98c507e33b07eb96702d969fdd6ac6b6635c2f4817bf8226d24b78360f1cbd92",
-  "host_tool_disclosure_bytes": 119341,
+  "host_tool_disclosure_bytes": 118470,
   "gateway_capability_profile": "reference_only_gateway_handoff_v1",
   "gateway_tool_surface_source": "deployment_contract",
   "host_tool_disclosure_max_bytes": 196608,
@@ -95,7 +95,6 @@
     "material_revision_create",
     "material_thumbnail_create",
     "material_processing_list",
-    "material_upload_confirm",
     "material_review_decide",
     "material_review_submit",
     "material_review_revoke",
@@ -134,8 +133,8 @@
     "material_skill_review_complete",
     "material_skill_review_list"
   ],
-  "remote_host_tool_surface_sha256": "90fd9b8800a1f1f8653ffc2cee7128a7e895e739432a93a7391752a0ea6fba04",
-  "skill_bundle_fingerprint": "791571149091b618fe9bceb3e1f449640c80dfef2febd0d3bd41f29ef042beee",
+  "remote_host_tool_surface_sha256": "51cf6f3d01b4156852090f27aece4afd29541482e7222ac3db035e1fd231ef46",
+  "skill_bundle_fingerprint": "4fa98403227d0d166422d53fabf79dba9d5389ba16d3514603dc76af07a2813c",
   "remote_skills": [
     "ads-configuration",
     "ads-monitoring",
@@ -161,7 +160,7 @@
   "oauth_client_id_metadata_document": "https://chatgpt.com/oauth/codex/npgGhq3mjJ9W/client.json",
   "minimum_codex_version": "0.144.5",
   "tested_codex_versions": [
-    "0.155.0-alpha.9"
+    "0.155.1"
   ],
   "minimum_server_contract": "AdsCapabilityMcpPublicSchema.v3",
   "host_tool_fallback": {

@@ -11,14 +11,6 @@ cryptography 45 because version 50 publishes no Intel macOS wheel). Their
 license files are kept in the archive. It is
 built on the target architecture and has no ChatGrowing server code or secrets.
 
-`downloads.tsv` documents the older, FFmpeg-based direct transfer runtime.
-That path is retained only for compatibility; it is not used by the default
-local intake setup. The FFmpeg binaries and notices are not in the new bundle.
-
-The installer downloads, rather than compiles, third-party runtime components into a ChatGrowing-only user directory. Each executable download is pinned by URL and SHA-256 in downloads.tsv; Python package versions and hashes are locked in requirements.lock. No Homebrew, sudo, system Python or global PATH changes are used.
-
-- uv 0.12.17: https://github.com/astral-sh/uv (MIT/Apache-2.0). Its pinned managed Python catalog supplies CPython 3.11.14 via python-build-standalone, including upstream runtime licenses.
-- FFmpeg/FFprobe b6.1.1 binaries: https://github.com/eugeneware/ffmpeg-static/releases/tag/b6.1.1 . Per-platform upstream LICENSE and README are downloaded and checksum-verified into the runtime notices directory. Consult those files for the binary build license, build provenance and source information.
-- Python package licenses accompany the installed wheels. The helper uses a private environment, not the host's Python site-packages.
+The installer downloads the pinned complete bundle into a ChatGrowing-only user directory. No Homebrew, sudo, system Python or global PATH changes are used. Python package licenses accompany the installed wheels; the helper uses a private environment, not the host's Python site-packages. Legacy remote-reference support for images does not make FFmpeg part of this runtime.
 
 macOS arm64 and x86_64 have pinned artifacts. A listed artifact does not establish testing on every macOS release. No Windows/Linux automatic installer is claimed by this manifest.

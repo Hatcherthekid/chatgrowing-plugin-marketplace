@@ -28,10 +28,11 @@ description: 管理当前企业已授权的 YouTube 频道与素材；用于频�
 ## 任务选择
 
 - 查看频道或最近视频：使用工作区或视频列表；精确对象使用视频详情。只把当前授权版本且未过期的观察写成可见事实。
-- 上传新视频：先登记用户指定文件，形成独立素材版本；选择频道模板或逐项补齐发布字段。使用 `material_distribution_batch_submission_preview` 核对固定文件、频道、可见性和发布字段；用户本轮指令已明确覆盖清单时，调用 `material_distribution_batch_submit` 一次提交，不重复请求确认。仅在用户意图或关键字段不明确时追问。审核是可选意见，不代替发布指令。
+- 上传新视频：单条和多条都创建固定批次。先登记用户指定文件，形成独立素材版本；选择频道模板或逐项补齐发布字段。使用 `material_distribution_batch_submission_preview` 核对固定文件、频道、可见性和发布字段；用户本轮指令已明确覆盖清单时，调用 `material_distribution_batch_submit` 一次提交，不重复请求确认。仅在用户意图或关键字段不明确时追问。审核是可选意见，不代替发布指令。不要使用已退役的单条 Host 弹窗上传工具。
 - 复制已有素材：从源素材创建独立变体，再修改新变体的发布字段。复制不继承旧审核；封面和字幕等专属附件需要重新选择。
 - 修改已发布视频：先以当前视频绑定的素材创建新版本或变体，保存需要修改的发布字段，再预览精确视频操作并请求用户确认。删除先预览精确频道、视频 ID 和标题；用户已明确要求删除该对象时，该指令即为确认，可调用 `material_video_operation_confirm`，无需再等待 Host 弹窗。目标不明确或用户仅要求查看时不得删除。删除不可恢复，结果未知时只对账原操作，不换键重发。
-- 批量发布：固定源版本、频道和配置清单，`prepare` 后读取 `submission_preview`；用户指令覆盖每一项时，以预览返回的 `manifest_digest` 和稳定 `request_key` 调用一次 `submit`。内部保存草稿不再要求用户操作；逐项结果是事实，批次完成状态不能替代逐项成功、失败或未知。旧客户端尚未发现新工具时，核对 `prepare` 返回的逐项最终字段，使用现有 `material_distribution_batch_authorize` 和稳定 `request_key` 提交同一批次；服务端会保存草稿并完成授权，不再等待 Host 弹窗。
+- 批次发布：固定源版本、频道和配置清单，`prepare` 后读取 `submission_preview`；用户指令覆盖每一项时，以预览返回的 `manifest_digest` 和稳定 `request_key` 调用一次 `submit`。内部保存草稿不再要求用户操作；逐项结果是事实，批次完成状态不能替代逐项成功、失败或未知。
+- 同一原片经用户明确要求重复发布时，在创建批次时填写 `repeat_reason`；若随后用 `prepare.updates` 补配置，`config` 是完整替换，必须同时保留原 `repeat_reason`，并在 `submission_preview` 核对它仍存在。
 - 模板：只保存稳定默认值。儿童声明、合成媒体声明、绝对发布时间以及具体封面/字幕由当前任务提供证据或用户决定，不能从模板猜测。
 
 ## 恢复与停止条件
@@ -44,11 +45,11 @@ description: 管理当前企业已授权的 YouTube 频道与素材；用于频�
 
 Host 若发现 `material_intake_receive` 且能以正式 `file` 参数提供用户明确选定的本地 MP4，优先用稳定 `request_key` 和原文件名接收。返回 `ready` 只证明 ChatGrowing 已验证并保存临时原件；随后按固定清单预览与单次提交发布。不得把接收任务当作 YouTube 已发布，也不得提取 Host OAuth 凭据发自建 HTTP 请求。Host 无法提供文件参数或大文件传输失败时，报告具体能力或传输边界，保留原任务；不能假称已绕过网络限制。
 
-Host 无法把本地路径绑定为正式文件参数，但本地助手已就绪时，使用 `material_local_intake_inspect` → 远程 `material_local_intake_handoff` → `material_local_intake_transfer`。摘要交接只授权这个 MP4 进入服务器 15 天临时存储，不授权发布；`ready` 后才创建发布清单。本机只哈希原文件，服务器检查视频。用稳定 request_key 与原交接续传；交接过期则重新检查并申请交接。助手使用从 ChatGrowing 官网下载并校验的独立运行包，不要求本机安装 FFmpeg、Git、Python 或开发工具。
+Host 无法把本地路径绑定为正式文件参数，但本地助手已就绪时，对每个指定 MP4 使用 `material_local_intake_inspect` → 远程 `material_local_intake_handoff`，再一次调用 `material_local_intake_batch_start` 启动批量后台接收；用 `material_local_intake_batch_status` 查询逐文件字节进度和结果。单条文件也走该批量入口。摘要交接只授权对应 MP4 进入服务器 15 天临时存储，不授权发布；仅对 `ready` 的文件创建发布清单。失败文件保持原接收会话和稳定 request_key 续传，交接闲置过期时重新检查并申请交接；不可为重试换新的发布幂等键。本机只哈希原文件，服务器检查视频。助手使用从 ChatGrowing 官网下载并校验的独立运行包，不要求本机安装 FFmpeg、Git、Python 或开发工具。
 
 ## 本地助手首次准备
 
 查看频道、视频或其他远程操作不需要本地运行包。仅在用户要求读取电脑中的文件且本地助手尚未就绪时，Agent 定位已安装插件的 `scripts/setup_material_source_mcp.sh` 并执行一次准备；它只从 ChatGrowing 官网获取一份固定 SHA-256 的完整运行包，不要求用户安装 Python、Git、Homebrew、FFmpeg 或 Xcode。下载可能超过 Host 的 MCP 启动时限，所以先由 Agent 完成准备，再重连本地 MCP；不要求用户登录第二次。网络失败报告官网运行包下载或校验阶段，不改变账号授权；其他系统不得假称已支持自动准备。
 
 
-旧 `material_local_inspect`、`material_local_handoff`、`material_local_register`、`material_local_transfer` 属于本地 FFmpeg 直传兼容路径；新运行包不包含 FFmpeg，不用它们处理视频。不得调用已退役的 material_local_login / material_local_youtube_connect，也不读取 Host token。准备 ID 或交接 ID 本身不代表已授权发布；发布由正式工具按当前用户意图执行。
+旧本地直传和逐次推进工具已从本地 MCP 公开列表退役。当前运行包不含 FFmpeg，也不从 GitHub 获取运行组件；不读取 Host token。准备 ID 或交接 ID 本身不代表已授权发布；发布由正式工具按当前用户意图执行。

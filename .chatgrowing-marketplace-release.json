@@ -1,12 +1,12 @@
 {
   "schema_version": "chatgrowing.public-marketplace-release.v1",
   "marketplace_name": "chatgrowing",
-  "recommended_plugin_version": "0.4.9",
-  "source_git_commit": "57d657a54a9c07f072a8d67fb75da85b498b5b8b",
-  "artifact_sha256": "13eea7b94cace6eec86001ea21b7995dba63bd85bb3b5aa8abfc1ba1dc68ad90",
+  "recommended_plugin_version": "0.4.10",
+  "source_git_commit": "ab07fb9368d1620ec019ecef068f1f4b51a95b38",
+  "artifact_sha256": "49b112179847d1efed7028ebcce9542bfa7b51d854b9c95ae36ba92f3d14d853",
   "tool_schema_version": "AdsCapabilityMcpPublicSchema.v3",
   "tool_schema_fingerprint": "98c507e33b07eb96702d969fdd6ac6b6635c2f4817bf8226d24b78360f1cbd92",
-  "skill_bundle_fingerprint": "791571149091b618fe9bceb3e1f449640c80dfef2febd0d3bd41f29ef042beee",
+  "skill_bundle_fingerprint": "4fa98403227d0d166422d53fabf79dba9d5389ba16d3514603dc76af07a2813c",
   "mcp_resource": "https://chatgrowing.com/mcp",
   "oauth_scopes": [
     "ads.read",
@@ -17,16 +17,16 @@
   "oauth_client_id_metadata_document": "https://chatgpt.com/oauth/codex/npgGhq3mjJ9W/client.json",
   "compatibility_policy": "current_and_previous_stable_plugin",
   "publication_mode": "upgrade",
-  "rollback_plugin_version": "0.4.8",
+  "rollback_plugin_version": "0.4.9",
   "publication_gates_status": "owner_authorized_with_known_limitation",
   "known_limitations": [
     "Production OAuth refresh continuity remains unverified; this material transport release does not claim to fix token expiry."
   ],
   "tested_codex_versions": [
-    "0.155.0-alpha.9"
+    "0.155.1"
   ],
   "publication_gate_evidence_schema": "chatgrowing.material-compatibility-release.v1",
-  "publication_gate_evidence_sha256": "8259f2eb3788d23b916698caf91607fbe08805fbbdbe79aa6de1d0e523311677",
+  "publication_gate_evidence_sha256": "93f2e3832cdd3cbc4ec05954303648f98a87073755a1a37aaae224c7e439fb20",
   "update_contract": {
     "marketplace_snapshot": "source_type_aware",
     "git_source": "marketplace_upgrade_then_plugin_add",

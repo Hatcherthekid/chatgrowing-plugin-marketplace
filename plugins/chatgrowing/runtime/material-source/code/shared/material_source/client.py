@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import re
 import stat
+import time
 from urllib.parse import urlsplit
 
 import httpx
@@ -108,7 +109,8 @@ class MaterialSourceClient:
             raise MaterialError('material_transfer_receipt_invalid',502)
         return receipt
 
-    async def intake(self, path, *, max_chunks=16, expected_fingerprint=None, expected_stamp=None):
+    async def intake(self, path, *, max_chunks=16, expected_fingerprint=None, expected_stamp=None,
+                     on_progress=None, adaptive_chunks=False):
         """Bounded resumable intake before publication; no platform write."""
         import asyncio
         if type(max_chunks) is not int or not 1 <= max_chunks <= 256:
@@ -122,10 +124,14 @@ class MaterialSourceClient:
                     or expected_stamp is None or await asyncio.to_thread(source_stamp, path) != expected_stamp):
                 raise MaterialError('material_source_changed')
         receipt = await self._request('POST', '/v1/materials/intakes', json=fingerprint)
+        if on_progress is not None:
+            on_progress(receipt)
         file_id = receipt.get('file_id')
         if not isinstance(file_id, str) or not re.fullmatch(r'file_[0-9a-f]{32}', file_id):
             raise MaterialError('material_transfer_receipt_invalid', 502)
         base = '/v1/materials/intakes/' + file_id
+        chunk_bytes = CHUNK_SIZE
+        large_chunks_disabled = False
         for _ in range(max_chunks):
             if receipt.get('expected_sha256') != fingerprint['sha256'] or receipt.get('reserved_bytes') != fingerprint['byte_size']:
                 raise MaterialError('material_source_changed')
@@ -140,19 +146,46 @@ class MaterialSourceClient:
                     if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
                         raise MaterialError('material_source_not_regular')
                     stream.seek(offset)
-                    return stream.read(min(CHUNK_SIZE, fingerprint['byte_size'] - offset))
+                    return stream.read(min(chunk_bytes, fingerprint['byte_size'] - offset))
             data = await asyncio.to_thread(read)
-            if len(data) != min(CHUNK_SIZE, fingerprint['byte_size'] - offset):
+            if len(data) != min(chunk_bytes, fingerprint['byte_size'] - offset):
                 raise MaterialError('material_source_changed')
             if await asyncio.to_thread(source_stamp, path) != expected_stamp:
                 raise MaterialError('material_source_changed')
-            receipt = await self._request('PUT', base + '/chunks/' + str(offset), content=data,
-                headers={'Content-Type': 'application/octet-stream', 'Content-Length': str(len(data)),
-                         'X-Content-Sha256': hashlib.sha256(data).hexdigest()})
+            started = time.monotonic()
+            try:
+                receipt = await self._request('PUT', base + '/chunks/' + str(offset), content=data,
+                    headers={'Content-Type': 'application/octet-stream', 'Content-Length': str(len(data)),
+                             'X-Content-Sha256': hashlib.sha256(data).hexdigest()})
+            except MaterialError as exc:
+                recoverable = exc.code == 'material_transfer_result_unknown' or (
+                    chunk_bytes > CHUNK_SIZE and exc.status in (408, 413, 502))
+                if not recoverable:
+                    raise
+                # The server may have committed bytes before the response was lost.
+                # Its offset, never a client-side guess, determines the next write.
+                receipt = await self._request('GET', base)
+                if (receipt.get('file_id') != file_id or
+                        receipt.get('received_bytes') not in (offset, offset + len(data))):
+                    raise MaterialError('material_transfer_receipt_invalid', 502)
+                if receipt['received_bytes'] == offset and chunk_bytes > CHUNK_SIZE:
+                    chunk_bytes = CHUNK_SIZE
+                    large_chunks_disabled = True
+            if (adaptive_chunks and not large_chunks_disabled and
+                    receipt.get('max_chunk_size', CHUNK_SIZE) >= 4 * CHUNK_SIZE):
+                elapsed = time.monotonic() - started
+                if chunk_bytes == CHUNK_SIZE and elapsed < 4:
+                    chunk_bytes = 4 * CHUNK_SIZE
+                elif chunk_bytes > CHUNK_SIZE and elapsed > 45:
+                    chunk_bytes = CHUNK_SIZE
+            if on_progress is not None:
+                on_progress(receipt)
         if receipt.get('state') == 'receiving' and receipt.get('received_bytes') == fingerprint['byte_size']:
             if await asyncio.to_thread(source_stamp, path) != expected_stamp:
                 raise MaterialError('material_source_changed')
             receipt = await self._request('POST', base + '/complete')
+            if on_progress is not None:
+                on_progress(receipt)
         return receipt
 
     async def register_many(self, paths, *, request_key, inspector=None):
