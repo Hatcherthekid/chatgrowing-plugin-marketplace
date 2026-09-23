@@ -14,6 +14,8 @@ class HistoryTests(unittest.TestCase):
         page=sync.render(rows,'<!-- RELEASE_HISTORY -->')
         self.assertEqual(page.count('data-version='),2)
         self.assertIn('href="#v0.4.3"',page)
+        self.assertEqual(page.count('<header class="release-meta"><time '),2)
+        self.assertNotIn('<article class="release" id="v0.4.4" data-version="0.4.4"><aside>',page)
     def test_pagination_is_not_latest_only(self):
         batches=iter([[release('0.4.4')]*100,[release('0.4.3')]])
         self.assertEqual(len(sync.releases(lambda _:next(batches))),101)
