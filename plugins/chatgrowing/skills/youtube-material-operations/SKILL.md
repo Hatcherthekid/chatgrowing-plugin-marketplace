@@ -44,16 +44,11 @@ description: 管理当前企业已授权的 YouTube 频道与素材；用于频�
 
 Host 若发现 `material_intake_receive` 且能以正式 `file` 参数提供用户明确选定的本地 MP4，优先用稳定 `request_key` 和原文件名接收。返回 `ready` 只证明 ChatGrowing 已验证并保存临时原件；随后按固定清单预览与单次提交发布。不得把接收任务当作 YouTube 已发布，也不得提取 Host OAuth 凭据发自建 HTTP 请求。Host 无法提供文件参数或大文件传输失败时，报告具体能力或传输边界，保留原任务；不能假称已绕过网络限制。
 
-## 旧版本地文件运行环境（兼容在途任务）
+Host 无法把本地路径绑定为正式文件参数，但本地助手已就绪时，使用 `material_local_intake_inspect` → 远程 `material_local_intake_handoff` → `material_local_intake_transfer`。摘要交接只授权这个 MP4 进入服务器 15 天临时存储，不授权发布；`ready` 后才创建发布清单。本机只哈希原文件，服务器检查视频。用稳定 request_key 与原交接续传；交接过期则重新检查并申请交接。助手使用从 ChatGrowing 官网下载并校验的独立运行包，不要求本机安装 FFmpeg、Git、Python 或开发工具。
 
-查看频道、视频或其他远程操作不需要本地 Python。仅在用户要求读取电脑中的文件且本地助手尚未就绪时，定位已安装插件的 `scripts/setup_material_source_mcp.sh`，由 Agent 执行自动准备并重连助手；macOS 使用独立、校验过的运行环境，不要求用户手动安装 Python、Homebrew 或 Xcode。网络失败报告具体下载阶段，不改变账号授权；其他系统不得假称已支持自动准备。上传仍须遵守现有确认和权限要求。
+## 本地助手首次准备
+
+查看频道、视频或其他远程操作不需要本地运行包。仅在用户要求读取电脑中的文件且本地助手尚未就绪时，Agent 定位已安装插件的 `scripts/setup_material_source_mcp.sh` 并执行一次准备；它只从 ChatGrowing 官网获取一份固定 SHA-256 的完整运行包，不要求用户安装 Python、Git、Homebrew、FFmpeg 或 Xcode。下载可能超过 Host 的 MCP 启动时限，所以先由 Agent 完成准备，再重连本地 MCP；不要求用户登录第二次。网络失败报告官网运行包下载或校验阶段，不改变账号授权；其他系统不得假称已支持自动准备。
 
 
-## 本地文件的单登录交接
-
-1. 调用 `material_local_inspect` 检查用户指定文件，取得 preparation_id 和摘要。不传送本机路径给远程服务。
-2. 把返回的 name、proof_digest、manifest_digest 和稳定 request_key 交给 `material_local_handoff`，不填写 distribution_id；把其 handoff_id 与 preparation_id 交给 `material_local_register`。
-3. 复用现有素材版本、模板与上传确认流程。取得已确认的 distribution_id 后，再用同一文件摘要调用 `material_local_handoff`，这次指定该 distribution_id。
-4. 用新的 handoff_id、preparation_id、distribution_id 调用 `material_local_transfer`，按原任务回执继续。交接有效期 15 分钟；过期重新检查和交接即可，不登录、不重新创建或批准上传。
-
-不得调用已退役的 material_local_login / material_local_youtube_connect，也不读取 Host token。准备 ID 或交接 ID 本身不代表已授权上传；发布确认仍由正式工具完成。
+旧 `material_local_inspect`、`material_local_handoff`、`material_local_register`、`material_local_transfer` 属于本地 FFmpeg 直传兼容路径；新运行包不包含 FFmpeg，不用它们处理视频。不得调用已退役的 material_local_login / material_local_youtube_connect，也不读取 Host token。准备 ID 或交接 ID 本身不代表已授权发布；发布由正式工具按当前用户意图执行。

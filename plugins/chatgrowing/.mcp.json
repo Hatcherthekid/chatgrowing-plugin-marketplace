@@ -2,7 +2,7 @@
   "mcpServers": {
     "chatgrowing_ads_read": {
       "title": "ChatGrowing Ads Read",
-      "description": "OAuth 保护的 ChatGrowing Ads Read Remote MCP；只读取当前成员被授权的 source/provider 资源，App 仅作为查询与语义 facet。",
+      "description": "OAuth 保护的 ChatGrowing Ads Read Remote MCP；只读取当前成员被授权的资源；显式 AF App 授权覆盖该 App 全媒体 AF 数据，媒体账户授权保持对应账户范围。",
       "type": "http",
       "url": "https://chatgrowing.com/mcp",
       "scopes": [
@@ -17,7 +17,7 @@
     },
     "chatgrowing_material_local": {
       "title": "ChatGrowing Local Material Source",
-      "description": "读取用户明确指定的本地视频或图片；素材不在 ChatGrowing 服务器留存。",
+      "description": "读取用户明确指定的本地视频或图片；仅在明确调用临时接收工具时上传到 ChatGrowing 服务器。",
       "command": "bash",
       "args": [
         "./scripts/run_material_source_mcp.sh"

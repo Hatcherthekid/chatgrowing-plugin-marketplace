@@ -42,6 +42,34 @@ def source_manifest(path, *, inspector=None):
         'duration':duration,'mime':mime,'chunk_sha256':hashes}
 
 
+def source_stamp(path):
+    path = Path(path).absolute()
+    if path.is_symlink() or not path.is_file() or path.suffix.lower() != '.mp4':
+        raise MaterialError('material_source_not_regular', 422)
+    stat_result = path.stat()
+    if not 0 < stat_result.st_size <= CHUNK_SIZE * MAX_CHUNKS:
+        raise MaterialError('material_source_size_invalid', 422)
+    return (stat_result.st_dev, stat_result.st_ino, stat_result.st_size,
+            stat_result.st_mtime_ns, stat_result.st_ctime_ns)
+
+
+def source_fingerprint(path):
+    """Hash a local MP4 for server-side inspection; never needs FFmpeg."""
+    path = Path(path).absolute()
+    before = source_stamp(path)
+    signature = lambda s: (s.st_dev, s.st_ino, s.st_size, s.st_mtime_ns, s.st_ctime_ns)
+    whole = hashlib.sha256()
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    with os.fdopen(fd, 'rb') as stream:
+        if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode) or signature(os.fstat(stream.fileno())) != before:
+            raise MaterialError('material_source_changed')
+        for data in iter(lambda: stream.read(CHUNK_SIZE), b''):
+            whole.update(data)
+        if signature(os.fstat(stream.fileno())) != before or source_stamp(path) != before:
+            raise MaterialError('material_source_changed')
+    return {'sha256': whole.hexdigest(), 'byte_size': before[2], 'name': path.name}
+
+
 class MaterialSourceClient:
     def __init__(self, client, *, api_prefix=''):
         # Credentials belong to the configured ChatGrowing origin only.
@@ -78,6 +106,53 @@ class MaterialSourceClient:
             'name':Path(path).name,'request_key':request_key,'manifest':manifest})
         if receipt.get('source_kind')!='remote_reference' or receipt.get('server_copy') is not False:
             raise MaterialError('material_transfer_receipt_invalid',502)
+        return receipt
+
+    async def intake(self, path, *, max_chunks=16, expected_fingerprint=None, expected_stamp=None):
+        """Bounded resumable intake before publication; no platform write."""
+        import asyncio
+        if type(max_chunks) is not int or not 1 <= max_chunks <= 256:
+            raise MaterialError('material_chunk_limit_invalid', 422)
+        if expected_fingerprint is None:
+            fingerprint = await asyncio.to_thread(source_fingerprint, path)
+            expected_stamp = await asyncio.to_thread(source_stamp, path)
+        else:
+            fingerprint = expected_fingerprint
+            if (not isinstance(fingerprint, dict) or set(fingerprint) != {'sha256', 'byte_size', 'name'}
+                    or expected_stamp is None or await asyncio.to_thread(source_stamp, path) != expected_stamp):
+                raise MaterialError('material_source_changed')
+        receipt = await self._request('POST', '/v1/materials/intakes', json=fingerprint)
+        file_id = receipt.get('file_id')
+        if not isinstance(file_id, str) or not re.fullmatch(r'file_[0-9a-f]{32}', file_id):
+            raise MaterialError('material_transfer_receipt_invalid', 502)
+        base = '/v1/materials/intakes/' + file_id
+        for _ in range(max_chunks):
+            if receipt.get('expected_sha256') != fingerprint['sha256'] or receipt.get('reserved_bytes') != fingerprint['byte_size']:
+                raise MaterialError('material_source_changed')
+            if receipt.get('state') != 'receiving' or receipt.get('received_bytes') == fingerprint['byte_size']:
+                break
+            offset = receipt.get('received_bytes')
+            if type(offset) is not int or offset < 0 or offset % CHUNK_SIZE:
+                raise MaterialError('material_transfer_receipt_invalid', 502)
+            def read():
+                fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+                with os.fdopen(fd, 'rb') as stream:
+                    if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+                        raise MaterialError('material_source_not_regular')
+                    stream.seek(offset)
+                    return stream.read(min(CHUNK_SIZE, fingerprint['byte_size'] - offset))
+            data = await asyncio.to_thread(read)
+            if len(data) != min(CHUNK_SIZE, fingerprint['byte_size'] - offset):
+                raise MaterialError('material_source_changed')
+            if await asyncio.to_thread(source_stamp, path) != expected_stamp:
+                raise MaterialError('material_source_changed')
+            receipt = await self._request('PUT', base + '/chunks/' + str(offset), content=data,
+                headers={'Content-Type': 'application/octet-stream', 'Content-Length': str(len(data)),
+                         'X-Content-Sha256': hashlib.sha256(data).hexdigest()})
+        if receipt.get('state') == 'receiving' and receipt.get('received_bytes') == fingerprint['byte_size']:
+            if await asyncio.to_thread(source_stamp, path) != expected_stamp:
+                raise MaterialError('material_source_changed')
+            receipt = await self._request('POST', base + '/complete')
         return receipt
 
     async def register_many(self, paths, *, request_key, inspector=None):

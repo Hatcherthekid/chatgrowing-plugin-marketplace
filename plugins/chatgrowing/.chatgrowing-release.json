@@ -14,14 +14,14 @@
   "source_exposure": "reviewed_plugin_and_local_helper_bundle_only",
   "server_authorization_required": true,
   "compatibility_policy": "current_and_previous_stable_plugin",
-  "plugin_version": "0.4.7",
+  "plugin_version": "0.4.8",
   "bootstrap_contract_version": "ChatGrowingBootstrapContract.v1",
-  "source_git_commit": "0b3538330ff6b17e0a3fa9662e5a0d4d0f6f02aa",
-  "built_at_utc": "2026-09-22T05:36:38.397524Z",
-  "artifact_sha256": "fe6aa79109eda93d5d43514f300dd0d71d82cf0e01afe36a2b0e150fec3af308",
+  "source_git_commit": "7abf3ae4e02096f11a5cda114eb3910b85866b4d",
+  "built_at_utc": "2026-09-23T04:21:51.218903Z",
+  "artifact_sha256": "5ddf40420828eb0b3934fa5959c34e9925dd2e7f9a9a182c195b725a02244a2e",
   "tool_schema_version": "AdsCapabilityMcpPublicSchema.v3",
-  "tool_schema_fingerprint": "d31267a2ce7b85cf868cda4496d936e12366c490ffe9383be0e73b4a9c961e23",
-  "host_tool_disclosure_bytes": 118636,
+  "tool_schema_fingerprint": "98c507e33b07eb96702d969fdd6ac6b6635c2f4817bf8226d24b78360f1cbd92",
+  "host_tool_disclosure_bytes": 119341,
   "gateway_capability_profile": "reference_only_gateway_handoff_v1",
   "gateway_tool_surface_source": "deployment_contract",
   "host_tool_disclosure_max_bytes": 196608,
@@ -71,6 +71,7 @@
     "material_events",
     "material_targets",
     "material_local_handoff",
+    "material_local_intake_handoff",
     "material_youtube_connect",
     "material_tags",
     "material_tag_create",
@@ -133,8 +134,8 @@
     "material_skill_review_complete",
     "material_skill_review_list"
   ],
-  "remote_host_tool_surface_sha256": "3006fe2d8ad6411966ffa0cb6b332fd708d6fd78d5417e5b2010678181ee5733",
-  "skill_bundle_fingerprint": "f44e69575143e76350b65fe85c5591ba7fd88bfa065adf983fb63895d0118b77",
+  "remote_host_tool_surface_sha256": "90fd9b8800a1f1f8653ffc2cee7128a7e895e739432a93a7391752a0ea6fba04",
+  "skill_bundle_fingerprint": "791571149091b618fe9bceb3e1f449640c80dfef2febd0d3bd41f29ef042beee",
   "remote_skills": [
     "ads-configuration",
     "ads-monitoring",
@@ -159,7 +160,9 @@
   ],
   "oauth_client_id_metadata_document": "https://chatgpt.com/oauth/codex/npgGhq3mjJ9W/client.json",
   "minimum_codex_version": "0.144.5",
-  "tested_codex_versions": [],
+  "tested_codex_versions": [
+    "0.155.0-alpha.9"
+  ],
   "minimum_server_contract": "AdsCapabilityMcpPublicSchema.v3",
   "host_tool_fallback": {
     "contract_uri": "ads-contract://host-tool-fallback-v1",
@@ -170,12 +173,14 @@
   "rollback_plugin_version": "not_assigned",
   "publication_gates": {
     "artifact_independent_direct_query": "required",
-    "fresh_session_tool_discovery_and_query": "required",
-    "resource_bridge_discovery_contract": "required",
+    "auth0_rotation_policy_parity": "required",
     "authorization_fail_closed_contract": "required",
-    "same_login_material_handoff": "required",
+    "fresh_session_tool_discovery_and_query": "required",
     "host_session_recovery": "required",
     "managed_material_runtime": "required",
-    "oauth_refresh_continuity": "required"
+    "oauth_host_refresh_recovery": "required",
+    "oauth_refresh_lifecycle": "required",
+    "resource_bridge_discovery_contract": "required",
+    "same_login_material_handoff": "required"
   }
 }

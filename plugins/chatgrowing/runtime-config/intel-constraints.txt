@@ -1,0 +1,2 @@
+# cryptography 50 has no macOS x86_64 wheel; local helper requires binaries.
+cryptography<46
