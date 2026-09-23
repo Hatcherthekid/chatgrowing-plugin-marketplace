@@ -63,7 +63,7 @@ Windows 从当前桌面应用安装目录定位其捆绑 CLI，不假设与 macO
 /bin/bash /absolute/path/install_without_git.sh --codex "$BUNDLED_CODEX"
 ```
 
-该脚本从公开 GitHub API 解析 main 的精确 commit，下载该快照并安装为持久的本地 marketplace。它仅安装插件文件，之后仍须验证 ChatGrowing 登录及远程查询。它不会把“文件安装成功”称为业务可用。
+该脚本只访问 `chatgrowing.com`：读取精确 commit 与 SHA-256 清单，下载并校验同域名的不可变快照，再安装为持久的本地 marketplace。它仅安装插件文件，之后仍须验证 ChatGrowing 登录及远程查询。它不会把“文件安装成功”称为业务可用。
 
 通过本脚本安装的来源，更新时仍运行同一脚本并加 `--update-owned-source`，再完成第 5 节的目标设备接入验收。登记失败后可以重复同一命令；只接管具有安装器标记且身份校验通过的残留目录。已存在 Git 来源继续走原有 marketplace upgrade 和显式 plugin add；不得替换来源、删除凭据或让用户重新 Google 授权来解决安装问题。
 
@@ -75,7 +75,7 @@ Windows 从当前桌面应用安装目录定位其捆绑 CLI，不假设与 macO
 
 - 新安装可给上述脚本加 `--with-materials`；先完成插件安装并回读，再准备素材环境。素材失败返回 20，已安装插件保留，只重试素材准备，不重复更新或登录。
 - 已安装插件则运行实际安装目录中的 `scripts/setup_material_source_mcp.sh`，完成后重新连接本地助手。
-- 自动下载固定版本、校验 SHA-256、只安装带哈希的预编译 wheel；Python、FFmpeg 和 FFprobe 放在 ChatGrowing 专用用户目录，不改系统环境，不使用 sudo。
+- 从 `chatgrowing.com` 自动下载一个完整运行包并校验 SHA-256；包含独立 Python 和已锁定依赖，服务器接收模式不需要本机 FFmpeg。不改系统环境，不使用 sudo。
 - 当前自动准备范围是 macOS Apple Silicon 与 Intel。其他系统保持远程能力可用，不声称本地文件自动安装已支持。
 - 网络失败先按下载阶段处理并重试；失败保留旧运行环境，不回退到源码编译或要求安装开发工具。安装中断或文件缺失时重新运行同一准备脚本：替代环境完整验证后才切换，原不完整目录保留以供诊断，无需手动删除或重新登录。
 
@@ -126,7 +126,7 @@ Canonical 仓库为 `https://github.com/Hatcherthekid/chatgrowing-plugin-marketp
 
 ### 下载失败与连接失败分别处理
 
-HTTPS 快照不使用 raw.githubusercontent.com，但仍需要访问 GitHub API 和 codeload。普通 GitHub 页面可访问不证明这些下载域名可访问。TLS 证书失败不得通过 `curl -k` 或关闭验证绕过；没有验证可用的下载来源时，保留旧版并明确下载未完成，不重复登录或宣称升级成功。
+HTTPS 快照和本地运行包均由 `chatgrowing.com` 提供，不要求客户网络访问 GitHub API、codeload、GitHub Release 或 PyPI。TLS 证书失败不得通过 `curl -k` 或关闭验证绕过；没有验证可用的下载来源时，保留旧版并明确下载未完成，不重复登录或宣称升级成功。
 
 升级结束核对实际 installed version、enabled 和同一 MCP URL。如果升级时桌面 Host 仍在运行，完整退出并重新打开桌面应用一次，再新建任务；不注销账号。Codex 0.148.0-alpha.9 已复现外部 CLI 升级后 Host 保留已删除的旧缓存路径，只新建任务或重载 MCP 配置仍可报 os error 2。Host 重启解决的是缓存路径刷新，不代表远程连接或业务查询通过。素材助手准备是独立步骤，远程查询不依赖本地 Python。更新成功也不证明另一设备的 MCP 传输故障已修复。
 

@@ -264,12 +264,20 @@ verify_rebind_recovery_version() {
   fi
 }
 verify_rebind_recovery_version
-curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --retry 2 --max-time 60 \
-  'https://api.github.com/repos/Hatcherthekid/chatgrowing-plugin-marketplace/commits/main' -o "$stage/commit.json"
-commit="$(json_value "$stage/commit.json" sha)"
-[[ "$commit" =~ ^[0-9a-f]{40}$ ]] || { printf '%s\n' 'Could not resolve the public marketplace commit.' >&2; exit 78; }
-curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --retry 2 --max-time 300 \
-  "https://codeload.github.com/Hatcherthekid/chatgrowing-plugin-marketplace/tar.gz/$commit" -o "$stage/repo.tar.gz"
+curl --fail --silent --show-error --proto '=https' --max-redirs 0 --retry 2 --max-time 60 \
+  'https://chatgrowing.com/downloads/marketplace/latest.json' -o "$stage/latest.json"
+commit="$(json_value "$stage/latest.json" commit)"
+archive_sha="$(json_value "$stage/latest.json" sha256)"
+archive_url="$(json_value "$stage/latest.json" url)"
+[[ "$commit" =~ ^[0-9a-f]{40}$ && "$archive_sha" =~ ^[0-9a-f]{64}$ &&
+   "$archive_url" == "https://chatgrowing.com/downloads/marketplace/snapshots/$commit.tar.gz" ]] || {
+  printf '%s\n' 'ChatGrowing marketplace snapshot metadata is invalid.' >&2; exit 78;
+}
+curl --fail --silent --show-error --proto '=https' --max-redirs 0 --retry 2 --max-time 600 \
+  "$archive_url" -o "$stage/repo.tar.gz"
+[[ "$(shasum -a 256 "$stage/repo.tar.gz" | awk '{print $1}')" == "$archive_sha" ]] || {
+  printf '%s\n' 'ChatGrowing marketplace snapshot checksum mismatch.' >&2; exit 78;
+}
 prefix="chatgrowing-plugin-marketplace-$commit"
 while IFS= read -r member; do
   [[ "$member" == "$prefix/"* && "$member" != *'/../'* && "$member" != */.. ]] || { printf '%s\n' 'Unexpected marketplace archive path.' >&2; exit 78; }
