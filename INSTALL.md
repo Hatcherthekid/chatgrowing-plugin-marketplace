@@ -2,7 +2,7 @@
 
 把下面这段交给目标电脑上的 Codex 桌面版：
 
-> 阅读 https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/blob/main/INSTALL.md，帮我安装 ChatGrowing。复用已有安装和有效授权，从未完成的步骤继续，最后查询一条我有权访问的真实广告数据。遇到故障请读取对应错误并处理，不要把“安装成功”或“登录成功”当成全部完成。
+> 阅读 https://chatgrowing.com/downloads/marketplace/INSTALL.md，帮我安装 ChatGrowing。复用已有安装和有效授权，从未完成的步骤继续，最后查询一条我有权访问的真实广告数据。遇到故障请读取对应错误并处理，不要把“安装成功”或“登录成功”当成全部完成。
 
 这是给执行安装的 Codex 使用的完整流程。用户不需要 SSH 密钥、GitHub 用户名或完整 Xcode。
 当前采用 self-hosted marketplace（HTTPS 快照或已有 Git 来源），不依赖 OpenAI public-directory / curated Marketplace。
@@ -29,7 +29,7 @@ Windows 从当前桌面应用安装目录定位其捆绑 CLI，不假设与 macO
 
 首次登录或处理反复掉授权时，先修复 Host 自动续期。2026-09-22 对真实二进制的隔离实测确认：0.148.0-alpha.9 在同一 app-server、两个任务连接中收到 HTTP 401 后，会重用其他连接已轮换并保存的旧凭据；0.155.0-alpha.9 默认路径也有此问题，启用 `mcp_oauth_refresh_coordination` 后同一场景通过。因此单看版本或重新登录不算修复。
 
-下载并阅读本仓库 `scripts/repair_oauth_host.sh`，由安装 Agent 使用已核验的桌面捆绑 CLI 执行：
+从 `https://chatgrowing.com/downloads/marketplace/repair_oauth_host.sh` 下载并阅读该脚本，由安装 Agent 使用已核验的桌面捆绑 CLI 执行：
 
 ```bash
 /bin/bash /absolute/path/repair_oauth_host.sh --codex "$BUNDLED_CODEX" --apply
@@ -57,7 +57,7 @@ Windows 从当前桌面应用安装目录定位其捆绑 CLI，不假设与 macO
 
 先执行第 1 节的已有状态检查。正常 ChatGrowing 来源继续复用。只有已核验的历史异常 local 来源按第 3 节恢复登记，不改变 OAuth 授权。
 
-新安装：通过 HTTPS 下载并阅读本仓库 `scripts/install_without_git.sh`，保存到临时文件后执行；不要 `curl | bash`。使用系统已有 Bash/curl/tar 和已核验的 Codex CLI，无需安装 Git、Homebrew、Python 或 Xcode。
+新安装：从 `https://chatgrowing.com/downloads/marketplace/install_without_git.sh` 下载并阅读脚本，保存到临时文件后执行；不要 `curl | bash`。使用系统已有 Bash/curl/tar 和已核验的 Codex CLI，无需安装 Git、Homebrew、Python 或 Xcode。
 
 ```bash
 /bin/bash /absolute/path/install_without_git.sh --codex "$BUNDLED_CODEX"
@@ -96,6 +96,14 @@ Canonical 仓库为 `https://github.com/Hatcherthekid/chatgrowing-plugin-marketp
 ```
 
 刷新市场只更新可用版本；再次 `plugin add` 才更新实际安装。保留相同插件身份，不先移除插件或市场，不 logout，不重新授权 Google。若当前 CLI 不支持这些命令，报告具体兼容性缺口，不手写缓存。
+
+如果公司网络无法连接该 Git 仓库，先确认 CLI 返回的来源确实是上述 canonical URL，再从官网下载安装器并显式迁移到官网 HTTPS 快照：
+
+```bash
+/bin/bash /absolute/path/install_without_git.sh --codex "$BUNDLED_CODEX" --migrate-git-source
+```
+
+安装器先核对现有市场缓存与实际安装版本相同、下载并验证新快照，再通过官方 CLI 重登记；旧缓存不改写，异常时优先用它恢复。此操作只更新插件来源和版本，不应注销 ChatGrowing 或重授权外部平台。正常可用的 Git 来源继续直接升级，不自动迁移。
 
 ### 已登记为 local
 

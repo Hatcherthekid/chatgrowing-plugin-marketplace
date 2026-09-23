@@ -5,13 +5,15 @@ codex=''
 with_materials=false
 update_owned=false
 migrate_source=''
+migrate_git=false
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --codex) codex="${2:-}"; shift 2 ;;
     --with-materials) with_materials=true; shift ;;
     --update-owned-source) update_owned=true; shift ;;
     --migrate-local-source) migrate_source="${2:-}"; [[ -n "$migrate_source" ]] || exit 2; shift 2 ;;
-    *) printf '%s\n' 'Usage: install_without_git.sh --codex /absolute/path/to/codex [--with-materials] [--update-owned-source | --migrate-local-source /verified/local/path]' >&2; exit 2 ;;
+    --migrate-git-source) migrate_git=true; shift ;;
+    *) printf '%s\n' 'Usage: install_without_git.sh --codex /absolute/path/to/codex [--with-materials] [--update-owned-source | --migrate-local-source /verified/local/path | --migrate-git-source]' >&2; exit 2 ;;
   esac
 done
 [[ "$codex" == /* && -x "$codex" ]] || { printf '%s\n' 'Use the verified Codex executable from the installed desktop app.' >&2; exit 2; }
@@ -56,6 +58,7 @@ printf '%s\n' "$$" > "$lock/pid"
 [[ -x /usr/bin/plutil ]] || { printf '%s\n' 'This installer requires macOS system plutil.' >&2; exit 78; }
 json_value() { /usr/bin/plutil -extract "$2" raw -o - "$1" 2>/dev/null; }
 [[ "$update_owned" != true || -z "$migrate_source" ]] || { printf '%s\n' 'Choose update or migration, not both.' >&2; exit 2; }
+[[ "$migrate_git" != true || ( "$update_owned" != true && -z "$migrate_source" ) ]] || { printf '%s\n' 'Choose one source migration mode.' >&2; exit 2; }
 stage="$(mktemp -d "$state/marketplace-download.XXXXXX")"
 success=false
 previous=''
@@ -160,6 +163,7 @@ count="$(json_value "$stage/marketplaces.json" marketplaces)"
 has_source=false
 source_kind=''
 source_path=''
+registered_root=''
 for ((index=0;index<count;index++)); do
   name="$(json_value "$stage/marketplaces.json" "marketplaces.$index.name")"
   [[ "$name" == chatgrowing ]] || continue
@@ -167,24 +171,27 @@ for ((index=0;index<count;index++)); do
   has_source=true
   source_kind="$(json_value "$stage/marketplaces.json" "marketplaces.$index.marketplaceSource.sourceType" || true)"
   source_path="$(json_value "$stage/marketplaces.json" "marketplaces.$index.marketplaceSource.source")"
+  registered_root="$(json_value "$stage/marketplaces.json" "marketplaces.$index.root")"
 done
 # Recover only from a durable pre-removal receipt. A path alone cannot prove
 # which version was installed before the marketplace was removed.
 rebind_journal="$state/pending-marketplace-rebind.plist"
-if [[ "$has_source" != true && -n "$migrate_source" && -f "$state/previous-marketplace-source.txt" &&
-      "$(cat "$state/previous-marketplace-source.txt")" == "$migrate_source" ]]; then
+if [[ "$has_source" != true && ( -n "$migrate_source" || "$migrate_git" == true ) &&
+      -f "$state/previous-marketplace-source.txt" ]]; then
+  recovery_source="$(cat "$state/previous-marketplace-source.txt")"
+  [[ -z "$migrate_source" || "$recovery_source" == "$migrate_source" ]] || exit 10
   if [[ ! -f "$rebind_journal" || -L "$rebind_journal" ||
-        "$(json_value "$rebind_journal" source || true)" != "$migrate_source" ]]; then
+        "$(json_value "$rebind_journal" source || true)" != "$recovery_source" ]]; then
     printf '%s\n' 'Interrupted migration has no verified original-version receipt; automatic recovery stopped before registration.' >&2
     exit 10
   fi
   recovery_version="$(json_value "$rebind_journal" installedVersion)"
-  verify_chatgrowing_source "$migrate_source" || exit 10
-  if [[ -n "$recovery_version" && "$(json_value "$migrate_source/plugins/chatgrowing/.codex-plugin/plugin.json" version)" != "$recovery_version" ]]; then
+  verify_chatgrowing_source "$recovery_source" || exit 10
+  if [[ -n "$recovery_version" && "$(json_value "$recovery_source/plugins/chatgrowing/.codex-plugin/plugin.json" version)" != "$recovery_version" ]]; then
     printf '%s\n' 'Interrupted migration source version changed; automatic recovery stopped before registration.' >&2
     exit 10
   fi
-  "$codex" plugin marketplace add "$migrate_source" --json
+  "$codex" plugin marketplace add "$recovery_source" --json
   if [[ -n "$recovery_version" ]]; then
     "$codex" plugin add chatgrowing@chatgrowing --json
     "$codex" plugin list --json > "$stage/resumed-installed.json"
@@ -198,7 +205,12 @@ if [[ "$has_source" != true && -n "$migrate_source" && -f "$state/previous-marke
     done
     [[ "$resumed_verified" == true ]] || { printf '%s\n' 'Interrupted migration restoration unverified; stopped.' >&2; exit 79; }
   fi
-  has_source=true; source_kind=local; source_path="$migrate_source"
+  has_source=true; source_kind=local; source_path="$recovery_source"
+  migrate_source="$recovery_source"; migrate_git=false
+fi
+if [[ "$migrate_git" == true && "$source_kind" == local && "$source_path" == "$installed_source" &&
+      -f "$installed_source/.chatgrowing-http-source" ]]; then
+  migrate_git=false; update_owned=true
 fi
 # Retrying an already completed cache migration is an owned-source update.
 if [[ -n "$migrate_source" && "$source_kind" == local && "$source_path" == "$installed_source" &&
@@ -206,7 +218,18 @@ if [[ -n "$migrate_source" && "$source_kind" == local && "$source_path" == "$ins
       "$(cat "$state/previous-marketplace-source.txt")" == "$migrate_source" ]]; then
   migrate_source=''; update_owned=true
 fi
-if [[ -n "$migrate_source" ]]; then
+if [[ "$migrate_git" == true ]]; then
+  [[ "$has_source" == true && "$source_kind" == git &&
+     "$source_path" == https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace.git &&
+     "$registered_root" == /* && -d "$registered_root" && ! -L "$registered_root" ]] || {
+    printf '%s\n' 'Git migration requires the exact existing ChatGrowing marketplace.' >&2; exit 10;
+  }
+  original_source="$(cd "$registered_root" && pwd -P)"
+  case "$original_source/" in */.tmp/marketplaces/*) ;; *) printf '%s\n' 'Git marketplace cache location is unexpected; preserved.' >&2; exit 10;; esac
+  verify_chatgrowing_source "$original_source" || exit 10
+  [[ -z "$(find "$original_source" -type l -print -quit)" ]] || exit 10
+  rebind=true
+elif [[ -n "$migrate_source" ]]; then
   [[ "$has_source" == true && "$source_kind" == local && "$migrate_source" == /* && ! -L "$migrate_source" && -d "$migrate_source" ]] || { printf '%s\n' 'Migration requires the existing ChatGrowing local source.' >&2; exit 10; }
   migrate_source="$(cd "$migrate_source" && pwd -P)"
   [[ "$source_path" == /* && -d "$source_path" && ! -L "$source_path" ]] || exit 10
@@ -230,7 +253,7 @@ if [[ -n "$migrate_source" ]]; then
   fi
 elif [[ "$has_source" == true ]]; then
   if [[ "$source_kind" != local || "$source_path" != /* || ! -f "$source_path/.chatgrowing-http-source" ]]; then
-    printf '%s\n' 'Existing ChatGrowing source preserved. Git sources use marketplace upgrade then plugin add; legacy local sources use --migrate-local-source with the verified path.' >&2
+    printf '%s\n' 'Existing ChatGrowing source preserved. Use --migrate-git-source when its Git remote is unreachable, or --migrate-local-source for a verified local path.' >&2
     exit 10
   fi
   verify_chatgrowing_source "$source_path" || exit 10
@@ -310,6 +333,7 @@ if [[ "$rebind" == true ]]; then
   printf '%s\n' "$original_source" > "$state/previous-marketplace-source.txt"
   /usr/bin/plutil -create xml1 "$state/pending-marketplace-rebind.new"
   /usr/bin/plutil -insert source -string "$original_source" "$state/pending-marketplace-rebind.new"
+  /usr/bin/plutil -insert sourceType -string "$source_kind" "$state/pending-marketplace-rebind.new"
   /usr/bin/plutil -insert installedVersion -string "$before_version" "$state/pending-marketplace-rebind.new"
   mv "$state/pending-marketplace-rebind.new" "$rebind_journal"
   registration_changed=true
