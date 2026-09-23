@@ -15,7 +15,7 @@ for ((i=0;i<180;i++)); do
 done
 [[ "$locked" == true ]] || { printf '%s\n' 'ChatGrowing setup is busy; retry when installation finishes.' >&2; exit 75; }
 staging="${material_runtime}.staging.$$"
-cleanup() { rm -rf "$staging" "${staging}.download"; rmdir "$lock" 2>/dev/null || true; }
+cleanup() { rm -rf "$staging"; rmdir "$lock" 2>/dev/null || true; }
 trap cleanup EXIT
 if material_runtime_ready; then exit 0; fi
 
@@ -31,12 +31,19 @@ done < "$material_config/bundles.tsv"
 archive="$material_state/downloads/$bundle_sha"
 if [[ ! -f "$archive" ]] || [[ "$(material_hash "$archive")" != "$bundle_sha" ]]; then
   printf '%s\n' 'Downloading the verified ChatGrowing local helper from chatgrowing.com.' >&2
-  curl --fail --silent --show-error --proto '=https' --max-redirs 0 --retry 2 --connect-timeout 20 --max-time 600 \
-    "$bundle_url" -o "${staging}.download"
-  [[ "$(material_hash "${staging}.download")" == "$bundle_sha" ]] || {
+  partial="${archive}.partial"
+  [[ ! -L "$partial" && ( ! -e "$partial" || -f "$partial" ) ]] || {
+    printf '%s\n' 'Invalid ChatGrowing runtime partial download.' >&2; exit 78;
+  }
+  # Keep partial bytes across a slow-network timeout or process exit. The final
+  # SHA-256 still authenticates every byte before the archive can be extracted.
+  curl --fail --silent --show-error --proto '=https' --max-redirs 0 --retry 2 --connect-timeout 20 --max-time 1800 \
+    --continue-at - "$bundle_url" -o "$partial"
+  [[ "$(material_hash "$partial")" == "$bundle_sha" ]] || {
+    rm -f "$partial"
     printf '%s\n' 'ChatGrowing runtime checksum mismatch; installation stopped.' >&2; exit 78;
   }
-  mv "${staging}.download" "$archive"
+  mv "$partial" "$archive"
 fi
 # The archive is release-pinned above; reject path traversal before extraction.
 tar -tzf "$archive" | awk '/^\// || /(^|\/)\.\.($|\/)/ { bad=1 } END { exit bad }' || {
