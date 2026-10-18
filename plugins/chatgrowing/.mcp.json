@@ -14,15 +14,6 @@
       "oauth": {
         "clientId": "https://chatgpt.com/oauth/codex/npgGhq3mjJ9W/client.json"
       }
-    },
-    "chatgrowing_material_local": {
-      "title": "ChatGrowing Local Material Source",
-      "description": "读取用户明确指定的本地视频或图片；仅在明确调用临时接收工具时上传到 ChatGrowing 服务器。",
-      "command": "bash",
-      "args": [
-        "./scripts/run_material_source_mcp.sh"
-      ],
-      "cwd": "."
     }
   }
 }

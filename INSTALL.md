@@ -2,7 +2,7 @@
 
 把下面这段交给目标电脑上的 Codex 桌面版：
 
-> 阅读 https://chatgrowing.com/downloads/marketplace/INSTALL.md，帮我安装 ChatGrowing。复用已有安装和有效授权，从未完成的步骤继续，最后查询一条我有权访问的真实广告数据。遇到故障请读取对应错误并处理，不要把“安装成功”或“登录成功”当成全部完成。
+> 阅读 https://github.com/Hatcherthekid/chatgrowing-plugin-marketplace/blob/main/INSTALL.md，帮我安装 ChatGrowing。复用已有安装和有效授权，从未完成的步骤继续，最后查询一条我有权访问的真实广告数据。遇到故障请读取对应错误并处理，不要把“安装成功”或“登录成功”当成全部完成。
 
 这是给执行安装的 Codex 使用的完整流程。用户不需要 SSH 密钥、GitHub 用户名或完整 Xcode。
 当前采用 self-hosted marketplace（HTTPS 快照或已有 Git 来源），不依赖 OpenAI public-directory / curated Marketplace。
@@ -29,20 +29,17 @@ Windows 从当前桌面应用安装目录定位其捆绑 CLI，不假设与 macO
 
 首次登录或处理反复掉授权时，先修复 Host 自动续期。2026-09-22 对真实二进制的隔离实测确认：0.148.0-alpha.9 在同一 app-server、两个任务连接中收到 HTTP 401 后，会重用其他连接已轮换并保存的旧凭据；0.155.0-alpha.9 默认路径也有此问题，启用 `mcp_oauth_refresh_coordination` 后同一场景通过。因此单看版本或重新登录不算修复。
 
-从 `https://chatgrowing.com/downloads/marketplace/repair_oauth_host.sh` 下载并阅读该脚本，由安装 Agent 使用已核验的桌面捆绑 CLI 执行：
+下载并阅读本仓库 `scripts/repair_oauth_host.sh`，由安装 Agent 使用已核验的桌面捆绑 CLI 执行：
 
 ```bash
 /bin/bash /absolute/path/repair_oauth_host.sh --codex "$BUNDLED_CODEX" --apply
-/bin/bash /absolute/path/repair_oauth_host.sh --codex "$BUNDLED_CODEX" --check --check-running
 ```
 
 该命令只通过官方 CLI 检查、开启并回读 Host 的全局刷新协调选项，不读取或清除 OAuth 凭据。执行前向用户说明这一配置改动；用户已要求安装或修复本问题时，不再重复索取同范围许可。已为 true 时不重复写入。
 
 - 返回 `host_upgrade_required`（21）：当前桌面 Host 不提供该能力，先更新桌面应用，再执行同一命令。只更新 PATH 中 npm/Homebrew CLI 无效；不要重登或重装插件碰运气。脚本不替换厂商二进制，也不声称已修好旧 Host。
-- `--check-running` 返回 `running_host_activation=restart_required`（26）：至少一个正在运行的桌面 app-server 比配置写入早超过 60 秒。保存工作后完全退出并重开桌面应用，再运行同一检查；不要在旧进程里重新授权。应用启动后一分钟内改写配置会返回 `unverified`（25），这是时间证据不足，不表示要再次重启。返回 `restart_observed_feature_not_proven`（0）只证明发现的进程晚于配置写入；真实查询和自然续期仍须验收。
-- `--apply` 返回 `host_configuration_enabled`（0）仅表示配置回读成功。脚本不强杀活跃任务；配置刚开启时先重开桌面应用，再检查运行进程。
+- 返回 `host_configuration_enabled`（0）：仅表示配置回读成功。若本次改了选项，保存工作后完全退出并重开桌面应用，使新 app-server 使用新配置；脚本不强杀活跃任务。已经启用时先核对当前进程是否已加载，避免反复重启。
 - 配置启用不能救回已被 Auth0 废止的凭证族。Host 修复生效后，只有仍收到明确 `invalid_grant` 的连接才重新进行一次 ChatGrowing 授权；有效连接不重登，不重新授权 YouTube。
-- 同一组凭证出现 `ferrt`（旧代重用）后，持续 `fertft` 或 `invalid_grant` 不能靠重试恢复；先完成 Host 生效检查，再做一次重新授权。记录脱敏的首次 `ferrt` 时间与 counter，后续相同错误不要逐条当成独立故障。
 - 故障电脑的验收仍需实际查询及自动续期。另一个设备、合成测试或配置回读不能代签。其他版本即使存在开关，也不自动继承 0.155.0-alpha.9 的实现验证；不得关闭 Auth0 轮换保护。
 
 只做只读检查时用 `--check`（默认）；20 表示选项关闭，22 表示检查失败，23/24 表示开启或回读失败。失败后保留现场，不继续登录流程。
@@ -57,27 +54,23 @@ Windows 从当前桌面应用安装目录定位其捆绑 CLI，不假设与 macO
 
 先执行第 1 节的已有状态检查。正常 ChatGrowing 来源继续复用。只有已核验的历史异常 local 来源按第 3 节恢复登记，不改变 OAuth 授权。
 
-新安装：从 `https://chatgrowing.com/downloads/marketplace/install_without_git.sh` 下载并阅读脚本，保存到临时文件后执行；不要 `curl | bash`。使用系统已有 Bash/curl/tar 和已核验的 Codex CLI，无需安装 Git、Homebrew、Python 或 Xcode。
+新安装：通过 HTTPS 下载并阅读本仓库 `scripts/install_without_git.sh`，保存到临时文件后执行；不要 `curl | bash`。使用系统已有 Bash/curl/tar 和已核验的 Codex CLI，无需安装 Git、Homebrew、Python 或 Xcode。
 
 ```bash
 /bin/bash /absolute/path/install_without_git.sh --codex "$BUNDLED_CODEX"
 ```
 
-该脚本只访问 `chatgrowing.com`：读取精确 commit 与 SHA-256 清单，下载并校验同域名的不可变快照，再安装为持久的本地 marketplace。它仅安装插件文件，之后仍须验证 ChatGrowing 登录及远程查询。它不会把“文件安装成功”称为业务可用。
+该脚本从公开 GitHub API 解析 main 的精确 commit，下载该快照并安装为持久的本地 marketplace。它仅安装插件文件，之后仍须验证 ChatGrowing 登录及远程查询。它不会把“文件安装成功”称为业务可用。
 
 通过本脚本安装的来源，更新时仍运行同一脚本并加 `--update-owned-source`，再完成第 5 节的目标设备接入验收。登记失败后可以重复同一命令；只接管具有安装器标记且身份校验通过的残留目录。已存在 Git 来源继续走原有 marketplace upgrade 和显式 plugin add；不得替换来源、删除凭据或让用户重新 Google 授权来解决安装问题。
 
-只做广告查询、查看频道/视频，不准备本地素材运行环境；本地文件助手未就绪不能阻塞远程验收，也不能据此要求用户安装系统组件。Host 支持按插件禁用单个 MCP 时，可在插件设置中停用 `chatgrowing_material_local`，保留远程 `chatgrowing_ads_read`。
+本候选只包含远程 Gateway、Skills、配置和品牌资源，不再附带本地素材 MCP、Python 或 FFmpeg 安装运行时。
 
 ### 用户需要本地文件上传时
 
-由安装 Agent 自动准备一次 ChatGrowing 专用运行环境，不把 Python/Homebrew/Xcode 安装工作交给用户：
+使用 Host 正式附件或 Console 的分块 intake。先确认当前 Host 支持附件或服务端返回了可用的 Console intake，再传输文件；安装成功本身不证明上传成功。
 
-- 新安装可给上述脚本加 `--with-materials`；先完成插件安装并回读，再准备素材环境。素材失败返回 20，已安装插件保留，只重试素材准备，不重复更新或登录。
-- 已安装插件则运行实际安装目录中的 `scripts/setup_material_source_mcp.sh`，完成后重新连接本地助手。
-- 从 `chatgrowing.com` 自动下载一个完整运行包并校验 SHA-256；包含独立 Python 和已锁定依赖，服务器接收模式不需要本机 FFmpeg。不改系统环境，不使用 sudo。
-- 当前自动准备范围是 macOS Apple Silicon 与 Intel。其他系统保持远程能力可用，不声称本地文件自动安装已支持。
-- 网络失败先按下载阶段处理并重试；失败保留旧运行环境，不回退到源码编译或要求安装开发工具。安装中断或文件缺失时重新运行同一准备脚本：替代环境完整验证后才切换，原不完整目录保留以供诊断，无需手动删除或重新登录。
+旧 `--with-materials` 参数仅返回本地运行时已退役的提示，不下载或执行 helper。已安装旧插件的本地 helper 配置只有显式更新插件后才退出；它的启动失败不能证明远程 Gateway 或平台授权失效。
 
 若坚持使用已有 Git 来源且 Git 不可用，先用 Host 报告的运行时 Git 或 `scripts/preflight.sh --git /verified/path` 检查。禁止为首次安装 ChatGrowing 默认执行 `xcode-select --install`；新安装直接走 HTTPS 快照流程。
 
@@ -96,14 +89,6 @@ Canonical 仓库为 `https://github.com/Hatcherthekid/chatgrowing-plugin-marketp
 ```
 
 刷新市场只更新可用版本；再次 `plugin add` 才更新实际安装。保留相同插件身份，不先移除插件或市场，不 logout，不重新授权 Google。若当前 CLI 不支持这些命令，报告具体兼容性缺口，不手写缓存。
-
-如果公司网络无法连接该 Git 仓库，先确认 CLI 返回的来源确实是上述 canonical URL，再从官网下载安装器并显式迁移到官网 HTTPS 快照：
-
-```bash
-/bin/bash /absolute/path/install_without_git.sh --codex "$BUNDLED_CODEX" --migrate-git-source
-```
-
-安装器先核对现有市场缓存与实际安装版本相同、下载并验证新快照，再通过官方 CLI 重登记；旧缓存不改写，异常时优先用它恢复。此操作只更新插件来源和版本，不应注销 ChatGrowing 或重授权外部平台。正常可用的 Git 来源继续直接升级，不自动迁移。
 
 ### 已登记为 local
 
@@ -134,7 +119,7 @@ Canonical 仓库为 `https://github.com/Hatcherthekid/chatgrowing-plugin-marketp
 
 ### 下载失败与连接失败分别处理
 
-HTTPS 快照和本地运行包均由 `chatgrowing.com` 提供，不要求客户网络访问 GitHub API、codeload、GitHub Release 或 PyPI。TLS 证书失败不得通过 `curl -k` 或关闭验证绕过；没有验证可用的下载来源时，保留旧版并明确下载未完成，不重复登录或宣称升级成功。
+HTTPS 快照不使用 raw.githubusercontent.com，但仍需要访问 GitHub API 和 codeload。普通 GitHub 页面可访问不证明这些下载域名可访问。TLS 证书失败不得通过 `curl -k` 或关闭验证绕过；没有验证可用的下载来源时，保留旧版并明确下载未完成，不重复登录或宣称升级成功。
 
 升级结束核对实际 installed version、enabled 和同一 MCP URL。如果升级时桌面 Host 仍在运行，完整退出并重新打开桌面应用一次，再新建任务；不注销账号。Codex 0.148.0-alpha.9 已复现外部 CLI 升级后 Host 保留已删除的旧缓存路径，只新建任务或重载 MCP 配置仍可报 os error 2。Host 重启解决的是缓存路径刷新，不代表远程连接或业务查询通过。素材助手准备是独立步骤，远程查询不依赖本地 Python。更新成功也不证明另一设备的 MCP 传输故障已修复。
 
@@ -165,10 +150,11 @@ HTTPS 快照和本地运行包均由 `chatgrowing.com` 提供，不要求客户�
 
 ```bash
 /bin/bash /absolute/path/scripts/diagnose.sh --codex "$BUNDLED_CODEX" \
-  --task-skill-path "$ACTUAL_TASK_SKILL_PATH" --thread-id "$AFFECTED_THREAD_ID"
+  --task-skill-path "$ACTUAL_TASK_SKILL_PATH" --thread-id "$AFFECTED_THREAD_ID" \
+  --host-socket "$VERIFIED_EXISTING_HOST_SOCKET"
 ```
 
-`AFFECTED_THREAD_ID` 必须来自该设备实际任务，不编造。无 daemon、CLI 不支持或状态不可读时，诊断返回 unknown，开发侧检查同一任务的正式启动日志。也可以用 `--host-status /path/to/native-response.json` 对实际 `mcpServerStatus/list` 的 result 脱敏分类；这是外部提供的观测，不是独立验证。
+`AFFECTED_THREAD_ID` 必须来自该设备实际任务，不编造。`VERIFIED_EXISTING_HOST_SOCKET` 必须来自该运行中桌面 Host 的原生连接事实，不猜默认 daemon；脚本不会启动替代 Host，也不声称已核验 socket 的进程 owner。仅观察未来原生启动通知（默认 5 秒，`--observe-seconds` 最多 30 秒），不能保证重放历史失败。无 daemon、CLI 不支持或状态不可读时，诊断返回 unknown，开发侧检查同一任务的正式启动日志。也可以用 `--host-status /path/to/native-response.json` 对实际 `mcpServerStatus/list` 的 result 脱敏分类；这是外部提供的观测，不是独立验证。
 
 0.148.0-alpha.9 的原生状态响应不包含 `runtimeStatus` / `toolsError`，诊断应标记字段未提供；可用 authStatus、工具列表和该任务启动事件分别判断，不因缺少新字段认定连接失败。诊断同时只读检查本地运行时文件；缺失运行时通常导致脚本明确提示准备后关闭握手，不能据此解释进程启动时的 `os error 2`。
 
@@ -202,3 +188,18 @@ Resource Bridge 仅在本任务已发现 ChatGrowing 的正式合同和模板时
 没有授权资源时明确“接入完成，等待资源授权”，不能虚构查询成功。
 长效稳定另验：真实 access token 到期后刷新及查询、关闭重开、干净 Mac、Auxeo 同机迁移和中断恢复。
 后台/定时读取须另有对应授权；不要因一次安装请求自动创建周期任务。
+
+
+### 原生启动事件与旧 Host
+
+旧 Host 可不提供 `runtimeStatus`／`toolsError`；诊断不能把该字段缺失写成未登录。
+既有 socket 观测会保留 `mcpServer/startupStatus/updated` 的状态和脱敏错误类别，并严格核对当前 task/server。
+已有原生 JSONL 事件可通过 `--startup-events /path/events.jsonl --thread-id UUID` 配合 `--host-status` 分类；
+来自其它任务或无 threadId 的事件不会代签该任务。不要为诊断触发重新登录或提交原始 token／日志正文。
+`auth_status: unknown`、本地素材可用、资源列表为空、其它进程的 curl 结果，都不能作为外部账号未授权的证据。
+
+### 启动诊断与续期边界（2026-10-10）
+
+安装清单检查和远程 Host 启动取证分别执行；CLI 清单失败或超时不阻止解析已提供的原生状态／事件。仅使用 Host 明确提供且能核对归属的现有 app-server control socket；桌面未提供时记录 unavailable，不将浏览器 socket、通用 IPC 或另起 daemon 当作当前桌面连接。原生启动事件按 thread/server 取证，不承诺重放过去事件。
+
+刷新协调开关只负责协调刷新，不等于凭据保存失败恢复。当前签名 0.162 的隔离故障试验仍复现保存失败后的旧值重用；repair_oauth_host.sh 配置成功不能代签续期修复，私有未签名补丁不替换官方应用，也不访问真人 Keychain。真实远程工具调用与自然续期分别验收。

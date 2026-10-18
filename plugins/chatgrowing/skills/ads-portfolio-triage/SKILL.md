@@ -7,18 +7,16 @@ description: 对当前授权广告资产做跨范围巡检、排序和问题分�
 
 ## 入口
 
-新任务先调用 `ads_capability_context`。由当前 principal 的资源范围决定可读数据：显式 AF App 授权允许读取该 App 的全媒体 AF 数据；媒体账户授权只允许对应账户范围。App 名称或查询 facet 本身不授予权限。
+按需用 `ads_schema` 了解表，直接用 `ads_sql` 汇总当前授权范围。由当前 principal 的资源范围决定可读数据：显式 AF App 授权允许读取该 App 的全媒体 AF 数据；媒体账户授权只允许对应账户范围。App 名称或查询 facet 本身不授予权限。
 
 若当前 Host 能读取 ChatGrowing MCP Resources、但没有披露依赖的自定义 Tool，先读取 `ads-contract://host-tool-fallback-v1`，再按其中的 `ads-query://execute/{tool_name}{?arguments}` Resource Template 调用同一只读能力。该入口仅用于 Host 恢复，不扩大权限，也不得绕过正常 Tool。
 
 ## 编排
 
 1. 从用户目标确定日期、比较窗口、业务指标和需要扫描的授权范围。
-2. 按服务端 guidance 发现可用数据、健康状态和查询能力，不在 Skill 固化渠道、账户、对象树或分析 source。
-3. 先做服务端允许的汇总与排序，再对少量高影响或异常对象补充证据。
-4. 先收齐 `next_resource_cursor` 指向的资源页，再做全组合计；资源分页不是 Campaign 对象下钻。
-5. 每次查询后读取服务端 continuation，按实际返回的关系、breakdown 或 profile 下钻；不能假设所有投放具有同一层级。
-5. 输出优先级、影响、证据、反证、缺口和建议的下一次 probe，并说明停止条件。
+2. 先用 SQL 汇总与排序，再对少量高影响或异常对象补充证据。
+3. 根据查询结果修改 SQL，按真实原生 ID 和表关系下钻；不能假设所有投放具有同一层级。
+4. 输出优先级、影响、证据、反证、缺口和建议的下一次 probe，并说明停止条件。
 
 ## 边界
 

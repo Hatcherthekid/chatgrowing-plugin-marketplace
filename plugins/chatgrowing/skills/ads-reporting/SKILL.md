@@ -13,9 +13,11 @@ description: 设计、生成和追问广告报告；报告定义、字段、章�
 
 ## 编排
 
+用户要求定期自动发送时，先通过服务端能力发现核对当前配置、目的地、排期与运行回读入口。用当前 ads_schema 返回的表和字段形成可回放的 SQL 查询，不把一次查询结果保存为定期输入；目的地从当前成员可见且已验证的列表选择，不猜测标识或凭据。按照服务端当前声明的版本化合同保存内容与交付设置，先生成真实证据预览并展示覆盖、日期和限制；用户确认后发布，再通过运行记录和渠道回执判断是否已发送。若配置入口或运行器不可用，明确说明当前不能完成自动交付。
+
 1. 明确受众、日期、时区、范围、指标口径、比较方式、重点、cadence 与展示偏好；指标口径使用 `cohort` 或 `actual`，这些需求不等于服务端当前都已支持。
-2. 创建新报告时，先把选定的 `fact_semantics` 传给 Catalog 选择 source，再用 Describe 核对字段；把同一口径传给 Query，并用 Workspace SQL 或受限 Python 处理当前查询结果。普通 Query 不创建长期证据；只有明确保存或正式 Report run 才发布当前成员可读的 `PublishedEvidenceSet`。不要让 Report renderer 重新取数或计算指标。
-3. 从 `report.user_defined.v1` capability card 读取 `contract_ref`，再读取该 MCP Resource 取得当前服务端的完整 ReportSpec JSON Schema、composition envelope、digest 和示例；不要猜嵌套字段。无法由已发布字段或 Workspace 表达时返回 unsupported，不编造配置。
+2. 创建新报告时，用 ads_schema 核对业务表，使用 SQL 完成聚合和指标计算。将所需 SQL 放入 Report composition.queries；报告消费者执行并按明确报告请求保存输入。普通 ads_sql 不保存任何 Artifact；Report renderer 只渲染结果。
+3. 从 `report.user_defined.v1` capability card 读取 `contract_ref`，再读取该 MCP Resource 取得当前服务端的完整 ReportSpec JSON Schema、composition envelope、digest 和示例；不要猜嵌套字段。无法由已发布字段或 SQL 表达时返回 unsupported，不编造配置。
 4. 把 `mode=preview|generate`、`primary_window`、`spec`、`input_refs` 和可选 `feishu_projection` 放入 `composition`；`report_id` 对用户定义报告可省略并由服务端按 spec 生成。先创建真实数据 preview，用户确认后复用同一 ReportSpec、换成最新 `PublishedEvidenceSet` 生成正式 `ReportRun` 与 `RenderedAsset`。
 5. 用户定义 Report 完全继承 `PublishedEvidenceSet` 的 principal/binding scope，不另建 Report 权限。全媒体归因报告必须使用服务端返回的当前授权 resource_ref；媒体账户报告继续使用服务端返回的账户 resource_ref；普通 `app_ref` 仍只是查询 facet。
 6. 用户定义报告优先使用 `composition.primary_window`，连续范围最多 92 天；已注册兼容报告继续使用 `report_config.primary_window` 或旧 `report_date`。滚动周 section 必须声明源行的 `start_field/end_field`，编译器会过滤超窗行。`include_png_long_image` 生成长图；`composition.feishu_projection=true` 还要求长图，并且只返回不含收件人或 token 的 ProjectionPlan。
