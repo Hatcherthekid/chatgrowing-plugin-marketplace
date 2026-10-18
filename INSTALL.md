@@ -125,7 +125,7 @@ HTTPS 快照不使用 raw.githubusercontent.com，但仍需要访问 GitHub API 
 
 ## 4. 验证连接，再按需授权
 
-先尝试发现并调用 `ads_capability_context`。若没有正式工具，读取 `chatgrowing_ads_read` 的正式启动日志，
+先定向发现 `chatgrowing_ads_read` 的 `ads_sql` / `ads_schema`。若没有正式工具，读取该服务器的正式启动日志，
 识别是未注册、未启动、认证失败、HTTP/协议错误还是工具未披露。
 仅在缺少授权或正式客户端明确 `needs_reauth` / `invalid_grant` 时发起 OAuth：
 
@@ -159,7 +159,7 @@ HTTPS 快照不使用 raw.githubusercontent.com，但仍需要访问 GitHub API 
 0.148.0-alpha.9 的原生状态响应不包含 `runtimeStatus` / `toolsError`，诊断应标记字段未提供；可用 authStatus、工具列表和该任务启动事件分别判断，不因缺少新字段认定连接失败。诊断同时只读检查本地运行时文件；缺失运行时通常导致脚本明确提示准备后关闭握手，不能据此解释进程启动时的 `os error 2`。
 
 4. 按 `host_connection` 分流：notStarted/disabled 查该任务插件加载；starting 等待本次启动；authenticationRequired 才核实认证；failed 查正式传输/发现错误；connected 但工具缺失查 `toolsError` 和 Host catalog。Host catalog 中有工具仍不代表当前任务能够调用，必须实际调用。
-5. 正式调用 `ads_capability_context` 和当前频道发现工具，按服务端返回的授权范围列出用户请求的频道和账户。需要最小广告数据查询时再使用 Catalog Search → Describe → 必要 Health → Data Query。不通过名称猜账户，不跨资源查数。
+5. 正式广告查询使用 `ads_sql`；仅在实际表或字段未知时调用一次所需范围的 `ads_schema`，不把Catalog、Health或能力全目录作为查询前置。`SELECT 1`只证明传输，安装验收还须从当前授权业务表读取最小必要结果。用户确实要求账户、能力或频道发现时，再调用对应正式工具；不通过名称猜账户，不跨资源查数。
 
 Resource Bridge 仅在本任务已发现 ChatGrowing 的正式合同和模板时可用；没有服务器归属、连接和成功请求证据的空列表，不证明服务端返回空，也不证明无权限。Bridge 成功单独标为兼容查询通过，不能替代正式工具验收。
 
