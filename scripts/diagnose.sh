@@ -142,7 +142,7 @@ if [[ -n "$host_socket" ]]; then
   printf '%s\n' '{"id":1,"method":"initialize","params":{"clientInfo":{"name":"chatgrowing_diagnose","version":"1.0.0"},"capabilities":{"experimentalApi":true}}}' >&3
   if read_reply 1; then
     printf '%s\n' '{"method":"initialized","params":{}}' >&3
-    printf '{"id":2,"method":"mcpServerStatus/list","params":{"threadId":"%s","detail":"full","limit":100}}\n' "$thread" >&3
+    printf '{"id":2,"method":"mcpServerStatus/list","params":{"serverName":"chatgrowing_ads_read","threadId":"%s","detail":"toolsAndAuthOnly"}}\n' "$thread" >&3
     if read_reply 2; then status_file="$scratch/reply.json"; printf '%s\n' 'host_evidence=explicit_existing_socket_target_task' 'desktop_socket_ownership=not_independently_verified'; fi
   fi
   # Newer Hosts may report status before a pending optional client finishes.
@@ -199,7 +199,7 @@ for ((i=0;i<n;i++)); do
   case "$runtime" in notStarted|starting|connected|authenticationRequired|failed|cancelled|disabled) printf 'host_connection=%s\n' "$runtime" ;; *) printf '%s\n' 'host_connection=unknown';; esac
   auth="$(value "$status_file" "data.$i.authStatus" || true)"
   case "$auth" in unknown|unsupported|notLoggedIn|bearerToken|oAuth) printf 'host_auth=%s\n' "$auth" ;; *) printf '%s\n' 'host_auth=unknown';; esac
-  for tool in ads_capability_context material_targets; do
+  for tool in ads_schema ads_sql ads_capability_context material_targets; do
     if value "$status_file" "data.$i.tools.$tool.name" >/dev/null; then printf '%s=host_catalog_present\n' "$tool"; else printf '%s=host_catalog_absent\n' "$tool"; fi
   done
   error="$(value "$status_file" "data.$i.toolsError" || true)"
